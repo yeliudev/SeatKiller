@@ -11,13 +11,12 @@ stats_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/stats2/'
 layout_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/layoutByDate/'
 book_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/freeBook'
 token = '75PLJJO8PV12084027'
-date = datetime.date.today()
 
 
-def wait():
-    time_run = datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=30, second=0)
+def wait(hour, minute, second):
+    time_run = datetime.datetime.replace(datetime.datetime.now(), hour=hour, minute=minute, second=second)
     delta = time_run - datetime.datetime.now()
-    print('\n正在等待系统开放...')
+    print('\n正在等待系统开放...剩余' + str(delta.seconds) + '秒')
     time.sleep(delta.seconds)
 
 
@@ -28,14 +27,17 @@ def GetToken(url, token):
                'Accept-Language': 'zh-cn', 'token': token, 'Accept-Encoding': 'gzip, deflate'}
     datas = {'username': '2016301130016', 'password': '194614'}
     response = requests.get(url, params=datas, headers=headers, verify=False)
-    json = response.json()
-    print('\nTry getting token...Status: ' + str(json['status']))
-    if json['status'] == 'success':
-        print(json)
-        return json['data']['token']
-    else:
-        print(json)
-        return 'failed'
+    try:
+        json = response.json()
+        print('\nTry getting token...Status: ' + str(json['status']))
+        if json['status'] == 'success':
+            print('token：' + json['data']['token'])
+            return json['data']['token']
+        else:
+            print(json)
+            return 'failed'
+    except:
+        print('\nTry getting token...Status: Connection lost')
 
 
 def GetBuildings(url, token):
@@ -47,7 +49,6 @@ def GetBuildings(url, token):
     json = response.json()
     print('\nTry getting building information...Status: ' + str(json['status']))
     if json['status'] == 'success':
-        print(json)
         return json
     else:
         print(json)
@@ -60,14 +61,16 @@ def GetRooms(url, token):
                'User-Agent': 'doSingle/11 CFNetwork/893.14.2 Darwin/17.3.0',
                'Accept-Language': 'zh-cn', 'token': token, 'Accept-Encoding': 'gzip, deflate'}
     response = requests.get(url, headers=headers, verify=False)
-    json = response.json()
-    print('\nTry getting room information...Status: ' + str(json['status']))
-    if json['status'] == 'success':
-        print(json)
-        return json
-    else:
-        print(json)
-        return 'failed'
+    try:
+        json = response.json()
+        print('\nTry getting room information...Status: ' + str(json['status']))
+        if json['status'] == 'success':
+            return json
+        else:
+            print(json)
+            return 'failed'
+    except:
+        print('\nTry getting room information...Status: Connection lost')
 
 
 def GetSeats(url, token):
@@ -76,14 +79,16 @@ def GetSeats(url, token):
                'User-Agent': 'doSingle/11 CFNetwork/893.14.2 Darwin/17.3.0',
                'Accept-Language': 'zh-cn', 'token': token, 'Accept-Encoding': 'gzip, deflate'}
     response = requests.get(url, headers=headers, verify=False)
-    json = response.json()
-    print('\nTry getting seat information...Status: ' + str(json['status']))
-    if json['status'] == 'success':
-        print(json)
-        return json
-    else:
-        print(json)
-        return 'failed'
+    try:
+        json = response.json()
+        print('\nTry getting seat information...Status: ' + str(json['status']))
+        if json['status'] == 'success':
+            return json
+        else:
+            print(json)
+            return 'failed'
+    except:
+        print('\nTry getting seat information...Status: Connection lost')
 
 
 def BookSeat(url, token, startTime, endTime, seatID, date):
@@ -103,14 +108,13 @@ def BookSeat(url, token, startTime, endTime, seatID, date):
             print(json)
             return 'failed'
     except:
-        print('\nTry booking seat...Status: connection lost')
+        print('\nTry booking seat...Status: Connection lost')
 
 
 if input('请输入抢座模式（1.自动 2.手动）：') == '1':
     building_num = '1'
     room_num = '9'
-    date = date + datetime.timedelta(days=1)
-    date = date.strftime('%Y-%m-%d')
+    book_date = '2'
     seatID = '7469'
     startTime = '480'
     endTime = '1410'
@@ -122,25 +126,31 @@ else:
                          '             10.三楼东社会科学图书借阅区\n             11.四楼东图书阅览区\n             12.三楼自主学习区\n'
                          '             14.3C创客-双屏电脑（20台）\n             15.创新学习-MAC电脑（12台）\n'
                          '             16.创新学习-云桌面（42台）\n请输入房间编号：')
-    if input('请输入预约日期（1.今天 2.明天）：') == '1':
-        date = date.strftime('%Y-%m-%d')
-    else:
-        date = date + datetime.timedelta(days=1)
-        date = date.strftime('%Y-%m-%d')
-        print(date)
+    book_date = input('请输入预约日期（1.当日 2.次日）：')
     seatID = input('请输入座位ID：')
     startTime = input('请输入开始时间（以分钟为单位）：')
     endTime = input('请输入结束时间（以分钟为单位）：')
 
-stats_url = stats_url + building_num
-layout_url = layout_url + room_num + date
+while True:
+    date = datetime.date.today()
+    if book_date == '1':
+        date = date.strftime('%Y-%m-%d')
+    else:
+        date = date + datetime.timedelta(days=1)
+        date = date.strftime('%Y-%m-%d')
 
-token = GetToken(login_url, token)
-GetBuildings(filters_url, token)
-GetRooms(stats_url, token)
-GetSeats(layout_url, token)
-wait()
-for i in range(1, 100):
-    if BookSeat(book_url, token, startTime, endTime, seatID, date) == 'success':
-        print('抢座成功')
-        break
+    stats_url = stats_url + building_num
+    layout_url = layout_url + room_num + '/' + date
+
+    wait(22, 29, 0)
+    token = GetToken(login_url, token)
+    if token != 'fail':
+        GetBuildings(filters_url, token)
+        GetRooms(stats_url, token)
+        GetSeats(layout_url, token)
+
+        wait(22, 30, 0)
+        for i in range(1, 100):
+            if BookSeat(book_url, token, startTime, endTime, seatID, date) == 'success' or 'fail':
+                break
+        time.sleep(14400)
