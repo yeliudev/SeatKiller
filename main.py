@@ -162,7 +162,7 @@ else:
                        '             14.3C创客-双屏电脑（20台）\n             15.创新学习-MAC电脑（12台）\n'
                        '             16.创新学习-云桌面（42台）\n请输入房间编号（若由系统自动选择请输入1）：')
     else:
-        print('暂不支持其他分馆，已自动选择信息科学分管')
+        print('暂不支持其他分馆，已自动选择信息科学分馆')
         buildingId = '1'
         roomId = input('已获取房间列表：4.一楼3C创客空间\n             5.一楼创新学习讨论区\n             6.二楼西自然科学图书借阅区\n'
                        '             7.二楼东自然科学图书借阅区\n             8.三楼西社会科学图书借阅区\n             9.四楼西图书阅览区\n'
@@ -218,7 +218,7 @@ while True:
                     time.sleep(30)
                     if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=25,
                                                                             second=0):
-                        print('抢座失败，座位预约系统已关闭')
+                        print('\n抢座失败，座位预约系统已关闭\n')
                         try_booking = False
                         break
                     else:
