@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import requests
+import getpass
 import datetime
 import time
 
@@ -142,7 +143,7 @@ def BookSeat(url, token, startTime, endTime, seatID, date):
 
 
 username = input('请输入学号：')
-password = input('请输入图书馆密码：')
+password = getpass.getpass('请输入图书馆密码：')
 
 if input('请输入抢座模式（1.自动 2.手动）：') == '1':
     buildingId = '1'
