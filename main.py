@@ -2,10 +2,12 @@
 # -*- coding: utf-8 -*-
 
 import requests
+import warnings
 import getpass
 import datetime
 import time
 
+warnings.filterwarnings('ignore')
 login_url = 'https://seat.lib.whu.edu.cn:8443/rest/auth'
 filters_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/free/filters'
 stats_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/stats2/'
