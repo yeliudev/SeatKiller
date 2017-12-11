@@ -174,14 +174,15 @@ else:
     endTime = input('请输入结束时间（以分钟为单位）：')
 
 while True:
+    wait(22, 25, 0)
     freeSeats = []
+    date = datetime.date.today()
+    print('\ndate:' + date)
+
     stats_url = stats_url + buildingId
     layout_url = layout_url + roomId + '/' + date
     search_url = search_url + date + '/' + startTime + '/' + endTime
 
-    wait(22, 25, 0)
-    date = datetime.date.today()
-    print('\ndate:' + date)
     token = GetToken(login_url, token, username, password)
     if token != 'failed':
         GetBuildings(filters_url, token)
