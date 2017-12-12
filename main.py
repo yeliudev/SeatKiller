@@ -195,7 +195,7 @@ else:
     endTime = input('请输入结束时间（以分钟为单位，从0点开始计算）：')
 
 while True:
-    wait(22, 10, 0)
+    wait(22, 14, 30)
     try_booking = True
     date = datetime.date.today()
     date = date.strftime('%Y-%m-%d')
