@@ -213,6 +213,7 @@ while True:
                             try_booking = False
                             break
                         elif response == 'failed':
+                            time.sleep(5)
                             continue
                         else:
                             if freeSeatId != freeSeats(-1):
