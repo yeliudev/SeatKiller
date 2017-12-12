@@ -178,7 +178,7 @@ else:
     endTime = input('请输入结束时间（以分钟为单位）：')
 
 while True:
-    wait(22, 25, 0)
+    wait(22, 10, 0)
     try_booking = True
     date = datetime.date.today()
     print('\ndate:' + date)
@@ -193,12 +193,12 @@ while True:
         GetRooms(stats_url, token)
         GetSeats(layout_url, token)
 
-        wait(22, 30, 0)
+        wait(22, 15, 0)
         while (try_booking == True):
             if BookSeat(book_url, token, startTime, endTime, 7469, date) == 'success':
                 try_booking = False
                 break
-            elif datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=25,
+            elif datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45,
                                                                       second=0):
                 print('\n抢座失败，座位预约系统已关闭，2小时后尝试重新抢座')
                 time.sleep(7200)
@@ -242,7 +242,7 @@ while True:
                     elif response == 'failed':
                         continue
                     else:
-                        ddl = datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=25, second=0)
+                        ddl = datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45, second=0)
                         delta = ddl - datetime.datetime.now()
                         print('\n连接丢失，30秒后尝试重新抢座，系统开放时间剩余' + str(delta.seconds) + '秒\n')
                         time.sleep(30)
