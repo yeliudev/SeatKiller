@@ -218,7 +218,29 @@ while True:
                     time.sleep(30)
                     if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=25,
                                                                             second=0):
-                        print('\n抢座失败，座位预约系统已关闭\n')
+                        print('\n抢座失败，座位预约系统已关闭，2小时后重新尝试抢座')
+                        time.sleep(7200)
+                        freeSeats = []
+                        date = datetime.date.today()
+                        token = GetToken(login_url, token, username, password)
+                        if token != 'failed':
+                            SearchFreeSeat(search_url, token, 4, 1)
+                            for freeSeatId in freeSeats:
+                                response = BookSeat(book_url, token, startTime, endTime, freeSeatId, date)
+                                if response == 'success':
+                                    break
+                                elif response == 'failed':
+                                    continue
+                                else:
+                                    if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(),
+                                                                                            hour=5, minute=0,
+                                                                                            second=0):
+                                        print('\n抢座失败，系统已超时')
+                                        break
+                                    else:
+                                        print('\n连接丢失，2分钟后尝试重新抢座')
+                                        time.sleep(120)
+                                        continue
                         try_booking = False
                         break
                     else:
