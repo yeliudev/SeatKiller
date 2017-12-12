@@ -195,55 +195,56 @@ while True:
 
         wait(22, 30, 0)
         while (try_booking == True):
-            freeSeats = []
-            if roomId == '1' and seatID == '1':
-                for i in range(6, 12):
-                    SearchFreeSeat(search_url, token, i, buildingId)
-            elif roomId != '1' and seatID == '1':
-                SearchFreeSeat(search_url, token, roomId, buildingId)
+            if BookSeat(book_url, token, startTime, endTime, 7469, date) == 'success':
+                try_booking = False
+                break
+            elif datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=25,
+                                                                      second=0):
+                print('\n抢座失败，座位预约系统已关闭，2小时后尝试重新抢座')
+                time.sleep(7200)
+                freeSeats = []
+                date = datetime.date.today()
+                token = GetToken(login_url, token, username, password)
+                if token != 'failed':
+                    SearchFreeSeat(search_url, token, 4, 1)
+                    for freeSeatId in freeSeats:
+                        response = BookSeat(book_url, token, startTime, endTime, freeSeatId, date)
+                        if response == 'success':
+                            try_booking = False
+                            break
+                        elif response == 'failed':
+                            continue
+                        else:
+                            if freeSeatId != freeSeats(-1):
+                                print('\n连接丢失，2分钟后尝试继续抢座')
+                                time.sleep(120)
+                                continue
+                            break
+                print('\n抢座运行结束')
+                try_booking = False
+                break
             else:
-                freeSeats.append(seatID)
-
-            for freeSeatId in freeSeats:
-                response = BookSeat(book_url, token, startTime, endTime, freeSeatId, date)
-                if response == 'success':
-                    try_booking = False
-                    break
-                elif response == 'failed':
-                    continue
+                freeSeats = []
+                if roomId == '1' and seatID == '1':
+                    for i in range(6, 12):
+                        SearchFreeSeat(search_url, token, i, buildingId)
+                elif roomId != '1' and seatID == '1':
+                    SearchFreeSeat(search_url, token, roomId, buildingId)
                 else:
-                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=25, second=0)
-                    delta = ddl - datetime.datetime.now()
-                    print('\n连接丢失，30秒后尝试重新抢座，系统开放时间剩余' + str(delta.seconds) + '秒\n')
-                    time.sleep(30)
-                    if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=25,
-                                                                            second=0):
-                        print('\n抢座失败，座位预约系统已关闭，2小时后重新尝试抢座')
-                        time.sleep(7200)
-                        freeSeats = []
-                        date = datetime.date.today()
-                        token = GetToken(login_url, token, username, password)
-                        if token != 'failed':
-                            SearchFreeSeat(search_url, token, 4, 1)
-                            for freeSeatId in freeSeats:
-                                response = BookSeat(book_url, token, startTime, endTime, freeSeatId, date)
-                                if response == 'success':
-                                    break
-                                elif response == 'failed':
-                                    continue
-                                else:
-                                    if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(),
-                                                                                            hour=5, minute=0,
-                                                                                            second=0):
-                                        print('\n抢座失败，系统已超时')
-                                        break
-                                    else:
-                                        print('\n连接丢失，2分钟后尝试重新抢座')
-                                        time.sleep(120)
-                                        continue
+                    freeSeats.append(seatID)
+
+                for freeSeatId in freeSeats:
+                    response = BookSeat(book_url, token, startTime, endTime, freeSeatId, date)
+                    if response == 'success':
                         try_booking = False
                         break
+                    elif response == 'failed':
+                        continue
                     else:
+                        ddl = datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=25, second=0)
+                        delta = ddl - datetime.datetime.now()
+                        print('\n连接丢失，30秒后尝试重新抢座，系统开放时间剩余' + str(delta.seconds) + '秒\n')
+                        time.sleep(30)
                         break
 
         # for re_times in range(1, 100):
