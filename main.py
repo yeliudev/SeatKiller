@@ -221,7 +221,7 @@ if __name__ == '__main__':
                            '             66.A1-苹果区\n'
                            '请输入房间编号（若由系统自动选择请输入\'0\'）：')
         else:
-            print('分馆编号输入不合法，已默认设置为\'信息科学分馆\'')
+            print('分馆编号输入不合法，已默认设置为\'信息科学分馆\'，房间编号由系统自动选择')
             buildingId = '1'
             roomId = '0'
 
@@ -294,6 +294,6 @@ if __name__ == '__main__':
                                 continue
             else:
                 for i in range(1, 10):
-                    if SK.BookSeat(seatId, date, startTime, endTime):
+                    if SK.BookSeat(seatId, date, startTime, endTime) in ['Success', 'Fail']:
                         break
             time.sleep(14400)
