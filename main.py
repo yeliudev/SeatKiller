@@ -7,10 +7,9 @@ import getpass
 import datetime
 import time
 import smtplib
+import re
 from email.header import Header
 from email.mime.text import MIMEText
-from email.utils import parseaddr, formataddr
-import re
 
 
 # 需要额外安装requests模块（Terminal执行"pip3 install requests"）
@@ -346,7 +345,7 @@ if __name__ == '__main__':
                 elif datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23,
                                                                           minute=45, second=0):
                     print('\n抢座失败，座位预约系统已关闭，2小时后尝试捡漏')
-                    # time.sleep(7200)
+                    time.sleep(7200)
                     print('\n-------------------------捡漏模式开始-------------------------')
                     try_picking = True
                     date = datetime.date.today()
