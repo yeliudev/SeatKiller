@@ -234,6 +234,7 @@ class SeatKiller(object):
 if __name__ == '__main__':
     warnings.filterwarnings('ignore')
     token = '75PLJJO8PV12084027'  # 预先移动端抓包获取
+    running = True
 
     username = input('请输入学号：')
     password = getpass.getpass('请输入图书馆密码：')
@@ -320,7 +321,12 @@ if __name__ == '__main__':
             print('\n邮箱地址有误，无法发送邮件提醒')
             SK.to_addr = False
 
-    while True:
+    if SK.GetToken():
+        SK.GetUsrInf()
+    else:
+        running = False
+
+    while running:
         SK.Wait(22, 14, 30)
         try_booking = True
         date = datetime.date.today()
@@ -328,7 +334,6 @@ if __name__ == '__main__':
         print('\ndate:' + date)
 
         if SK.GetToken():
-            SK.GetUsrInf()
             SK.GetBuildings()
             SK.GetRooms(buildingId)
             if roomId != '0':
@@ -340,7 +345,7 @@ if __name__ == '__main__':
                     if SK.BookSeat(seatId, date, startTime, endTime) == 'Success':
                         try_booking = False
                     else:
-                        print('\n指定座位预约失败，尝试全馆检索其他空位...')
+                        print('\n指定座位预约失败，尝试检索其他空位...')
                         seatId = '0'
                 elif datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23,
                                                                           minute=45, second=0):
@@ -379,9 +384,11 @@ if __name__ == '__main__':
                         for i in rooms:
                             SK.SearchFreeSeat(buildingId, i, date, startTime, endTime)
                     else:
+                        print('\n尝试检索同区域其他座位...')
                         if SK.SearchFreeSeat(buildingId, roomId, date, startTime, endTime):
                             pass
                         else:
+                            print('\n当前区域暂无空位，尝试全馆检索空位...')
                             for i in rooms:
                                 SK.SearchFreeSeat(buildingId, i, date, startTime, endTime)
 
