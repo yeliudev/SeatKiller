@@ -154,12 +154,12 @@ class SeatKiller(object):
                 return 'Success'
             else:
                 print('\nTry searching for free seats in room ' + roomId + '...Status: failed')
-                return 'Fail'
+                return 'Failed'
         except:
             print('\nTry searching for free seats in room ' + roomId + '...Status: Connection lost')
             return 'Connection lost'
 
-    # 发起POST请求，尝试预定指定座位，成功则打印预定信息并返回'Success'，失败则返回'Fail'，连接丢失则返回'Connection lost'
+    # 发起POST请求，尝试预定指定座位，成功则打印预定信息并返回'Success'，失败则返回'Failed'，连接丢失则返回'Connection lost'
     def BookSeat(self, seatId, date, startTime, endTime):
         datas = {'t': '1', 'startTime': startTime, 'endTime': endTime, 'seat': seatId, 'date': date, 't2': '2'}
         response = requests.post(self.book_url, headers=self.headers, data=datas, verify=False)
@@ -176,7 +176,7 @@ class SeatKiller(object):
                 return 'Success'
             else:
                 print(json)
-                return 'Fail'
+                return 'Failed'
         except:
             print('\nTry booking seat...Status: Connection lost')
             return 'Connection lost'
@@ -230,7 +230,7 @@ class SeatKiller(object):
             return False
 
     def Loop(self, buildingId, startTime, endTime):
-        print('\n-------------------------捡漏模式开始-------------------------')
+        print('\n-------------------------捡漏模式开始--------------------------')
         try_picking = True
         date = datetime.date.today()
         date = date.strftime('%Y-%m-%d')
@@ -246,7 +246,7 @@ class SeatKiller(object):
                     if response == 'Success':
                         try_picking = False
                         break
-                    elif response == 'Fail':
+                    elif response == 'Failed':
                         time.sleep(5)
                         continue
                     else:
@@ -264,7 +264,7 @@ class SeatKiller(object):
             if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
                                                                     minute=0, second=0):
                 break
-        print('\n-------------------------捡漏模式结束-------------------------')
+        print('\n-------------------------捡漏模式结束--------------------------')
 
 
 # ----------------------------自动运行脚本-------------------------------
@@ -279,7 +279,7 @@ if __name__ == '__main__':
 
     SK = SeatKiller(token, username, password)
 
-    if input('请输入抢座模式（1.自动 2.手动）：') == '1':
+    if input('请选择信息输入模式（1.自动 2.手动）：') == '1':
         buildingId = '1'
         roomId = '0'
         seatId = '7469'
@@ -414,7 +414,7 @@ if __name__ == '__main__':
                             if response == 'Success':
                                 try_booking = False
                                 break
-                            elif response == 'Fail':
+                            elif response == 'Failed':
                                 time.sleep(2)
                                 continue
                             else:
