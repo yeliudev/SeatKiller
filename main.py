@@ -8,6 +8,7 @@ import datetime
 import time
 import smtplib
 import re
+import sys
 from email.header import Header
 from email.mime.text import MIMEText
 
@@ -228,6 +229,34 @@ class SeatKiller(object):
         except:
             return False
 
+    def loop(self, buildingId, startTime, endTime):
+        print('\n-------------------------捡漏模式开始-------------------------')
+        try_picking = True
+        date = datetime.date.today()
+        date = date.strftime('%Y-%m-%d')
+        while try_picking:
+            self.freeSeats = []
+            if SK.GetToken():
+                for i in rooms:
+                    self.SearchFreeSeat(buildingId, i, date, startTime, endTime)
+                for freeSeatId in self.freeSeats:
+                    response = self.BookSeat(freeSeatId, date, startTime, endTime)
+                    if response == 'Success':
+                        try_picking = False
+                        break
+                    elif response == 'Fail':
+                        time.sleep(5)
+                        continue
+                    else:
+                        print('\n连接丢失，5分钟后尝试继续抢座')
+                        time.sleep(300)
+                        continue
+            time.sleep(30)
+            if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
+                                                                    minute=0, second=0):
+                try_picking = False
+        print('\n-------------------------捡漏模式结束-------------------------')
+
 
 # ----------------------------自动运行脚本-------------------------------
 
@@ -249,70 +278,14 @@ if __name__ == '__main__':
         endTime = '720'
         rooms = SK.xt
         SK.to_addr = '879316283@qq.com'
+        if input('是否进入捡漏模式（1.是 2.否）：') == '1':
+            SK.loop(buildingId, startTime, endTime)
+            sys.exit()
     else:
         buildingId = input('请输入分馆编号（1.信息科学分馆 2.工学分馆 3.医学分馆 4.总馆）：')
-        if buildingId == '1':
-            rooms = SK.xt
-            roomId = input('已获取区域列表：4.一楼3C创客空间\n'
-                           '             5.一楼创新学习讨论区\n'
-                           '             6.二楼西自然科学图书借阅区\n'
-                           '             7.二楼东自然科学图书借阅区\n'
-                           '             8.三楼西社会科学图书借阅区\n'
-                           '             9.四楼西图书阅览区\n'
-                           '             10.三楼东社会科学图书借阅区\n'
-                           '             11.四楼东图书阅览区\n'
-                           '             12.三楼自主学习区\n'
-                           '             14.3C创客-双屏电脑（20台）\n'
-                           '             15.创新学习-MAC电脑（12台）\n'
-                           '             16.创新学习-云桌面（42台）\n'
-                           '请输入房间编号（若由系统自动选择请输入\'0\'）：')
-        elif buildingId == '2':
-            rooms = SK.gt
-            roomId = input('已获取区域列表：19.201室-东部自科图书借阅区\n'
-                           '             29.2楼-中部走廊\n'
-                           '             31.205室-中部电子阅览室笔记本区\n'
-                           '             32.301室-东部自科图书借阅区\n'
-                           '             33.305室-中部自科图书借阅区\n'
-                           '             34.401室-东部自科图书借阅区\n'
-                           '             35.405室中部期刊阅览区\n'
-                           '             37.501室-东部外文图书借阅区\n'
-                           '             38.505室-中部自科图书借阅区\n'
-                           '请输入区域编号（若由系统自动选择请输入\'0\'）：')
-        elif buildingId == '3':
-            rooms = SK.yt
-            roomId = input('已获取区域列表：20.204教学参考书借阅区\n'
-                           '             21.302中文科技图书借阅B区\n'
-                           '             23.305科技期刊阅览区\n'
-                           '             24.402中文文科图书借阅区\n'
-                           '             26.502外文图书借阅区\n'
-                           '             27.506医学人文阅览区\n'
-                           '请输入房间编号（若由系统自动选择请输入\'0\'）：')
-        elif buildingId == '4':
-            rooms = SK.zt
-            roomId = input('已获取区域列表：39.A1-座位区\n'
-                           '             40.C1自习区\n'
-                           '             51.A2\n'
-                           '             52.A3\n'
-                           '             56.B3\n'
-                           '             59.B2\n'
-                           '             60.A4\n'
-                           '             61.A5\n'
-                           '             62.A1-沙发区\n'
-                           '             65.B1\n'
-                           '             66.A1-苹果区\n'
-                           '请输入房间编号（若由系统自动选择请输入\'0\'）：')
-        else:
-            print('分馆编号输入不合法，已默认设置为\'信息科学分馆\'，房间编号由系统自动选择')
-            buildingId = '1'
-            roomId = '0'
-
-            if roomId == '0':
-                seatId = '0'
-            else:
-                seatId = input('请输入座位ID（若由系统自动选择请输入\'0\'）：')
-
         startTime = input('请输入开始时间（以分钟为单位，从0点开始计算）：')
         endTime = input('请输入结束时间（以分钟为单位，从0点开始计算）：')
+
         SK.to_addr = input('请输入邮箱地址，抢座成功之后将发送邮件提醒（若不需要邮件提醒，此项可放空）：')
         mail_addr = r'^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}$'
         if re.match(mail_addr, SK.to_addr):
@@ -320,6 +293,70 @@ if __name__ == '__main__':
         else:
             print('\n邮箱地址有误，无法发送邮件提醒')
             SK.to_addr = False
+
+        if input('是否进入捡漏模式（1.是 2.否）：') == '1':
+            SK.loop(buildingId, startTime, endTime)
+            sys.exit()
+        else:
+            if buildingId == '1':
+                rooms = SK.xt
+                roomId = input('已获取区域列表：4.一楼3C创客空间\n'
+                               '             5.一楼创新学习讨论区\n'
+                               '             6.二楼西自然科学图书借阅区\n'
+                               '             7.二楼东自然科学图书借阅区\n'
+                               '             8.三楼西社会科学图书借阅区\n'
+                               '             9.四楼西图书阅览区\n'
+                               '             10.三楼东社会科学图书借阅区\n'
+                               '             11.四楼东图书阅览区\n'
+                               '             12.三楼自主学习区\n'
+                               '             14.3C创客-双屏电脑（20台）\n'
+                               '             15.创新学习-MAC电脑（12台）\n'
+                               '             16.创新学习-云桌面（42台）\n'
+                               '请输入房间编号（若由系统自动选择请输入\'0\'）：')
+            elif buildingId == '2':
+                rooms = SK.gt
+                roomId = input('已获取区域列表：19.201室-东部自科图书借阅区\n'
+                               '             29.2楼-中部走廊\n'
+                               '             31.205室-中部电子阅览室笔记本区\n'
+                               '             32.301室-东部自科图书借阅区\n'
+                               '             33.305室-中部自科图书借阅区\n'
+                               '             34.401室-东部自科图书借阅区\n'
+                               '             35.405室中部期刊阅览区\n'
+                               '             37.501室-东部外文图书借阅区\n'
+                               '             38.505室-中部自科图书借阅区\n'
+                               '请输入区域编号（若由系统自动选择请输入\'0\'）：')
+            elif buildingId == '3':
+                rooms = SK.yt
+                roomId = input('已获取区域列表：20.204教学参考书借阅区\n'
+                               '             21.302中文科技图书借阅B区\n'
+                               '             23.305科技期刊阅览区\n'
+                               '             24.402中文文科图书借阅区\n'
+                               '             26.502外文图书借阅区\n'
+                               '             27.506医学人文阅览区\n'
+                               '请输入房间编号（若由系统自动选择请输入\'0\'）：')
+            elif buildingId == '4':
+                rooms = SK.zt
+                roomId = input('已获取区域列表：39.A1-座位区\n'
+                               '             40.C1自习区\n'
+                               '             51.A2\n'
+                               '             52.A3\n'
+                               '             56.B3\n'
+                               '             59.B2\n'
+                               '             60.A4\n'
+                               '             61.A5\n'
+                               '             62.A1-沙发区\n'
+                               '             65.B1\n'
+                               '             66.A1-苹果区\n'
+                               '请输入房间编号（若由系统自动选择请输入\'0\'）：')
+            else:
+                print('分馆编号输入不合法，已默认设置为\'信息科学分馆\'，房间编号由系统自动选择')
+                buildingId = '1'
+                roomId = '0'
+
+            if roomId == '0':
+                seatId = '0'
+            else:
+                seatId = input('请输入座位ID（若由系统自动选择请输入\'0\'）：')
 
     if SK.GetToken():
         SK.GetUsrInf()
@@ -381,32 +418,7 @@ if __name__ == '__main__':
                     else:
                         print('\n抢座失败，座位预约系统已关闭，2小时后尝试捡漏')
                         time.sleep(7200)
-                        print('\n-------------------------捡漏模式开始-------------------------')
-                        try_picking = True
-                        date = datetime.date.today()
-                        date = date.strftime('%Y-%m-%d')
-                        while try_picking:
-                            SK.freeSeats = []
-                            if SK.GetToken():
-                                for i in rooms:
-                                    SK.SearchFreeSeat(buildingId, i, date, startTime, endTime)
-                                for freeSeatId in SK.freeSeats:
-                                    response = SK.BookSeat(freeSeatId, date, startTime, endTime)
-                                    if response == 'Success':
-                                        try_picking = False
-                                        break
-                                    elif response == 'Fail':
-                                        time.sleep(5)
-                                        continue
-                                    else:
-                                        print('\n连接丢失，5分钟后尝试继续抢座')
-                                        time.sleep(300)
-                                        continue
-                            time.sleep(30)
-                            if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
-                                                                                    minute=0, second=0):
-                                try_picking = False
-                        print('\n-------------------------捡漏模式结束-------------------------')
+                        SK.loop(buildingId, startTime, endTime)
                         try_booking = False
             print('\n抢座运行结束')
             time.sleep(1800)
