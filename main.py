@@ -253,13 +253,13 @@ class SeatKiller(object):
                         print('\n连接丢失，5分钟后尝试继续抢座')
                         time.sleep(300)
                         continue
+                else:
+                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
+                    delta = ddl - datetime.datetime.now()
+                    print('\n循环结束，30秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
+                    time.sleep(30)
             else:
                 break
-
-            ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
-            delta = ddl - datetime.datetime.now()
-            print('\n循环结束，30秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
-            time.sleep(30)
 
             if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
                                                                     minute=0, second=0):
