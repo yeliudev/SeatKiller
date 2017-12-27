@@ -246,7 +246,7 @@ if __name__ == '__main__':
         roomId = '0'
         seatId = '7469'
         startTime = '480'
-        endTime = '1410'
+        endTime = '720'
         rooms = SK.xt
         SK.to_addr = '879316283@qq.com'
     else:
@@ -380,7 +380,11 @@ if __name__ == '__main__':
                         for i in rooms:
                             SK.SearchFreeSeat(buildingId, i, date, startTime, endTime)
                     else:
-                        SK.SearchFreeSeat(buildingId, roomId, date, startTime, endTime)
+                        if SK.SearchFreeSeat(buildingId, roomId, date, startTime, endTime):
+                            pass
+                        else:
+                            for i in rooms:
+                                SK.SearchFreeSeat(buildingId, i, date, startTime, endTime)
 
                     for freeSeatId in SK.freeSeats:
                         response = SK.BookSeat(freeSeatId, date, startTime, endTime)
