@@ -15,6 +15,7 @@ class SeatKiller(object):
 
     def __init__(self, token, username, password):
         self.login_url = 'https://seat.lib.whu.edu.cn:8443/rest/auth'  # 图书馆移动端登陆API
+        self.usr_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/user'  # 用户信息API
         self.filters_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/free/filters'  # 分馆和区域信息API
         self.stats_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/stats2/'  # 单一分馆区域信息API（拼接buildingId）
         self.layout_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/layoutByDate/'  # 单一区域座位信息API（拼接roomId+date）
@@ -64,6 +65,21 @@ class SeatKiller(object):
                 return False
         except:
             print('\nTry getting token...Status: Connection lost')
+            return False
+
+    # 发起GET请求，获取用户信息并打印出来，成功则返回True，否则返回False
+    def GetUsrInf(self):
+        response = requests.get(self.usr_url, headers=self.headers, verify=False)
+        try:
+            json = response.json()
+            if json['status'] == 'success':
+                print('\n你好，' + json['data']['name'] + ' 上次登陆时间：' + json['data']['lastLogin'])
+                return True
+            else:
+                print('\nTry getting user information...Status: fail')
+                return False
+        except:
+            print('\nTry getting user information...Status: Connection lost')
             return False
 
     # 发起GET请求，获取全校图书馆的分馆和区域信息，成功则返回json，否则返回False
@@ -234,13 +250,14 @@ if __name__ == '__main__':
         endTime = input('请输入结束时间（以分钟为单位，从0点开始计算）：')
 
     while True:
-        SK.Wait(22, 14, 30)
+        # SK.Wait(22, 14, 30)
         try_booking = True
         date = datetime.date.today()
         date = date.strftime('%Y-%m-%d')
         print('\ndate:' + date)
 
         if SK.GetToken():
+            SK.GetUsrInf()
             SK.GetBuildings()
             SK.GetRooms(buildingId)
             if roomId != '0':
