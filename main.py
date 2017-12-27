@@ -6,6 +6,11 @@ import warnings
 import getpass
 import datetime
 import time
+import smtplib
+from email.header import Header
+from email.mime.text import MIMEText
+from email.utils import parseaddr, formataddr
+import re
 
 
 # 需要额外安装requests模块（Terminal执行"pip3 install requests"）
@@ -23,7 +28,7 @@ class SeatKiller(object):
         self.book_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/freeBook'  # 座位预约API
 
         # 已预先爬取的roomId
-        self.xt = ['6', '7', '8', '9', '10', '11', '12']
+        self.xt = ['6', '7', '8', '9', '10', '11', '12', '4', '5']
         self.gt = ['19', '29', '31', '32', '33', '34', '35', '37', '38']
         self.yt = ['20', '21', '23', '24', '26', '27']
         self.zt = ['39', '40', '51', '52', '56', '59', '60', '61', '62', '65', '66']
@@ -32,6 +37,8 @@ class SeatKiller(object):
         self.token = token
         self.username = username
         self.password = password
+        self.name = 'user'
+        self.to_addr = False
         self.headers = {'Host': 'seat.lib.whu.edu.cn:8443',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
                         'Connection': 'keep-alive',
@@ -61,7 +68,10 @@ class SeatKiller(object):
                 print('token：' + json['data']['token'])
                 return json['data']['token']
             else:
-                print(json)
+                if json['code'] == '13':
+                    print('登录失败: 用户名或密码不正确')
+                else:
+                    print(json)
                 return False
         except:
             print('\nTry getting token...Status: Connection lost')
@@ -74,6 +84,7 @@ class SeatKiller(object):
             json = response.json()
             if json['status'] == 'success':
                 print('\n你好，' + json['data']['name'] + ' 上次登陆时间：' + json['data']['lastLogin'])
+                self.name = json['data']['name']
                 return True
             else:
                 print('\nTry getting user information...Status: fail')
@@ -157,6 +168,11 @@ class SeatKiller(object):
             print('\nTry booking seat...Status: ' + str(json['status']))
             if json['status'] == 'success':
                 self.PrintBookInf(json)
+                if SK.to_addr:
+                    if self.SendMail(json):
+                        print('\n\n邮件提醒已发送，若接收不到提醒，请将\'seatkiller@outlook.com\'添加至邮箱白名单')
+                    else:
+                        print('\n邮件发送失败')
                 return 'Success'
             else:
                 print(json)
@@ -165,7 +181,7 @@ class SeatKiller(object):
             print('\nTry booking seat...Status: Connection lost')
             return 'Connection lost'
 
-    # 打印座位凭证
+    # 打印座位预约凭证
     def PrintBookInf(self, json):
         print('\n--------------------座位预约成功!--------------------')
         print('ID：' + str(json['data']['id']))
@@ -177,6 +193,41 @@ class SeatKiller(object):
             print('状态：预约')
         print('地址：' + json['data']['location'])
         print('---------------------------------------------------')
+
+    # 邮件发送座位预约凭证
+    def SendMail(self, json):
+        try:
+            # 设置SMTP服务器及账号密码
+            from_addr = 'seatkiller@outlook.com'
+            password = 'simplebutunique2018'
+            smtp_server = 'smtp-mail.outlook.com'
+
+            # 构造邮件正文
+            text = '---------------------座位预约凭证----------------------' + '\nID：' + str(json['data']['id']) + '\n凭证号码：' + \
+                   json['data']['receipt'] + '\n时间：' + json['data']['onDate'] + ' ' + json['data']['begin'] + '～' + \
+                   json['data']['end']
+            if json['data']['checkedIn']:
+                text = text + '\n状态：已签到'
+            else:
+                text = text + '\n状态：预约'
+            text = text + '\n地址：' + json['data'][
+                'location'] + '\n-----------------------------------------------------\n\nPowered by goolhanrry'
+
+            msg = MIMEText(text, 'plain', 'utf-8')
+            msg['From'] = 'SeatKiller' + ' <' + from_addr + '>'
+            msg['To'] = 'user' + ' <' + self.to_addr + '>'
+            msg['Subject'] = Header('座位预约成功', 'utf-8').encode()
+
+            # 发送邮件
+            server = smtplib.SMTP(smtp_server, 587)
+            server.set_debuglevel(1)
+            server.starttls()
+            server.login(from_addr, password)
+            server.sendmail(from_addr, self.to_addr, msg.as_string())
+            server.quit()
+            return True
+        except:
+            return False
 
 
 # ----------------------------自动运行脚本-------------------------------
@@ -194,9 +245,10 @@ if __name__ == '__main__':
         buildingId = '1'
         roomId = '0'
         seatId = '7469'
-        startTime = '750'
-        endTime = '780'
+        startTime = '480'
+        endTime = '1410'
         rooms = SK.xt
+        SK.to_addr = '879316283@qq.com'
     else:
         buildingId = input('请输入分馆编号（1.信息科学分馆 2.工学分馆 3.医学分馆 4.总馆）：')
         if buildingId == '1':
@@ -254,16 +306,23 @@ if __name__ == '__main__':
             buildingId = '1'
             roomId = '0'
 
-        if roomId == '0':
-            seatId = '0'
-        else:
-            seatId = input('请输入座位ID（若由系统自动选择请输入\'0\'）：')
+            if roomId == '0':
+                seatId = '0'
+            else:
+                seatId = input('请输入座位ID（若由系统自动选择请输入\'0\'）：')
 
         startTime = input('请输入开始时间（以分钟为单位，从0点开始计算）：')
         endTime = input('请输入结束时间（以分钟为单位，从0点开始计算）：')
+        SK.to_addr = input('请输入邮箱地址，抢座成功之后将发送邮件提醒（若不需要邮件提醒，此项可放空）：')
+        mail_addr = r'^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}$'
+        if re.match(mail_addr, SK.to_addr):
+            print('\n邮箱地址正确，可以发送邮件提醒')
+        else:
+            print('\n邮箱地址有误，无法发送邮件提醒')
+            SK.to_addr = False
 
     while True:
-        # SK.Wait(22, 14, 30)
+        SK.Wait(22, 14, 30)
         try_booking = True
         date = datetime.date.today()
         date = date.strftime('%Y-%m-%d')
@@ -276,7 +335,7 @@ if __name__ == '__main__':
             if roomId != '0':
                 SK.GetSeats(roomId)
 
-            # SK.Wait(22, 15, 0)
+            SK.Wait(22, 15, 0)
             while try_booking:
                 if seatId != '0':
                     if SK.BookSeat(seatId, date, startTime, endTime) == 'Success':
@@ -284,8 +343,8 @@ if __name__ == '__main__':
                     else:
                         print('\n指定座位预约失败，尝试全馆检索其他空位...')
                         seatId = '0'
-                elif datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=11,
-                                                                          minute=14, second=0):
+                elif datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=23,
+                                                                          minute=45, second=0):
                     print('\n抢座失败，座位预约系统已关闭，2小时后尝试捡漏')
                     # time.sleep(7200)
                     print('\n-------------------------捡漏模式开始-------------------------')
@@ -320,7 +379,6 @@ if __name__ == '__main__':
                     if roomId == '0':
                         for i in rooms:
                             SK.SearchFreeSeat(buildingId, i, date, startTime, endTime)
-                            time.sleep(3)
                     else:
                         SK.SearchFreeSeat(buildingId, roomId, date, startTime, endTime)
 
@@ -338,5 +396,7 @@ if __name__ == '__main__':
                             print('\n连接丢失，一分钟后尝试重新抢座，系统开放时间剩余' + str(delta.seconds) + '秒\n')
                             time.sleep(60)
                             continue
-            print('\n抢座运行结束，等待下一次系统开放')
+            print('\n抢座运行结束')
             time.sleep(1800)
+        else:
+            break
