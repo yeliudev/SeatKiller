@@ -229,6 +229,7 @@ class SeatKiller(object):
         except:
             return False
 
+    # 捡漏模式
     def Loop(self, buildingId, startTime, endTime):
         print('\n-------------------------捡漏模式开始--------------------------')
         try_picking = True
@@ -373,7 +374,7 @@ if __name__ == '__main__':
         running = False
 
     while running:
-        SK.Wait(22, 39, 30)
+        SK.Wait(22, 14, 30)
         try_booking = True
         date = datetime.date.today() + datetime.timedelta(days=1)
         date = date.strftime('%Y-%m-%d')
@@ -385,50 +386,49 @@ if __name__ == '__main__':
             if roomId != '0':
                 SK.GetSeats(roomId)
 
-            SK.Wait(22, 40, 0)
+            SK.Wait(22, 15, 0)
             while try_booking:
                 if seatId != '0':
                     if SK.BookSeat(seatId, date, startTime, endTime) != 'Success':
                         print('\n指定座位预约失败，尝试检索其他空位...')
                         seatId = '0'
-                else:
-                    if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45,
+                elif datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45,
                                                                            second=0):
-                        SK.freeSeats = []
-                        if roomId == '0':
+                    SK.freeSeats = []
+                    if roomId == '0':
+                        for i in rooms:
+                            if SK.SearchFreeSeat(buildingId, i, date, startTime, endTime) == 'Connection lost':
+                                print('\n连接丢失，30秒后尝试继续检索空位')
+                                time.sleep(30)
+                    else:
+                        print('\n尝试检索同区域其他座位...')
+                        if SK.SearchFreeSeat(buildingId, roomId, date, startTime, endTime) != 'Success':
+                            print('\n当前区域暂无空位，尝试全馆检索空位...')
                             for i in rooms:
                                 if SK.SearchFreeSeat(buildingId, i, date, startTime, endTime) == 'Connection lost':
                                     print('\n连接丢失，30秒后尝试继续检索空位')
                                     time.sleep(30)
-                        else:
-                            print('\n尝试检索同区域其他座位...')
-                            if SK.SearchFreeSeat(buildingId, roomId, date, startTime, endTime) != 'Success':
-                                print('\n当前区域暂无空位，尝试全馆检索空位...')
-                                for i in rooms:
-                                    if SK.SearchFreeSeat(buildingId, i, date, startTime, endTime) == 'Connection lost':
-                                        print('\n连接丢失，30秒后尝试继续检索空位')
-                                        time.sleep(30)
 
-                        for freeSeatId in SK.freeSeats:
-                            response = SK.BookSeat(freeSeatId, date, startTime, endTime)
-                            if response == 'Success':
-                                try_booking = False
-                                break
-                            elif response == 'Failed':
-                                time.sleep(2)
-                                continue
-                            else:
-                                ddl = datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45, second=0)
-                                delta = ddl - datetime.datetime.now()
-                                print('\n连接丢失，1分钟后尝试重新抢座，系统开放时间剩余' + str(delta.seconds) + '秒\n')
-                                time.sleep(60)
-                                continue
-                        time.sleep(5)
-                    else:
-                        print('\n抢座失败，座位预约系统已关闭，2小时后尝试捡漏')
-                        time.sleep(7200)
-                        SK.Loop(buildingId, startTime, endTime)
-                        break
+                    for freeSeatId in SK.freeSeats:
+                        response = SK.BookSeat(freeSeatId, date, startTime, endTime)
+                        if response == 'Success':
+                            try_booking = False
+                            break
+                        elif response == 'Failed':
+                            time.sleep(2)
+                            continue
+                        else:
+                            ddl = datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45, second=0)
+                            delta = ddl - datetime.datetime.now()
+                            print('\n连接丢失，1分钟后尝试重新抢座，系统开放时间剩余' + str(delta.seconds) + '秒\n')
+                            time.sleep(60)
+                            continue
+                    time.sleep(5)
+                else:
+                    print('\n抢座失败，座位预约系统已关闭，2小时后尝试捡漏')
+                    time.sleep(7200)
+                    SK.Loop(buildingId, startTime, endTime)
+                    break
             print('\n抢座运行结束')
             time.sleep(7200)
         else:
