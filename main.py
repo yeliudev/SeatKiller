@@ -373,10 +373,10 @@ if __name__ == '__main__':
         running = False
 
     while running:
-        SK.Wait(22, 14, 30)
+        SK.Wait(22, 39, 30)
         try_booking = True
-        date = datetime.date.today()
-        date = date.strftime('%Y-%m-%d') + datetime.timedelta(days=1)
+        date = datetime.date.today() + datetime.timedelta(days=1)
+        date = date.strftime('%Y-%m-%d')
         print('\ndate:' + date)
 
         if SK.GetToken():
@@ -385,13 +385,13 @@ if __name__ == '__main__':
             if roomId != '0':
                 SK.GetSeats(roomId)
 
-            SK.Wait(22, 15, 0)
-            if seatId != '0':
-                if SK.BookSeat(seatId, date, startTime, endTime) != 'Success':
-                    print('\n指定座位预约失败，尝试检索其他空位...')
-                    seatId = '0'
-            else:
-                while try_booking:
+            SK.Wait(22, 40, 0)
+            while try_booking:
+                if seatId != '0':
+                    if SK.BookSeat(seatId, date, startTime, endTime) != 'Success':
+                        print('\n指定座位预约失败，尝试检索其他空位...')
+                        seatId = '0'
+                else:
                     if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45,
                                                                            second=0):
                         SK.freeSeats = []
