@@ -374,7 +374,7 @@ if __name__ == '__main__':
         running = False
 
     while running:
-        SK.Wait(22, 29, 53)
+        SK.Wait(22, 14, 30)
         try_booking = True
         date = datetime.date.today() + datetime.timedelta(days=1)
         date = date.strftime('%Y-%m-%d')
@@ -386,7 +386,7 @@ if __name__ == '__main__':
             if roomId != '0':
                 SK.GetSeats(roomId)
 
-            SK.Wait(22, 30, 0)
+            SK.Wait(22, 15, 0)
             while try_booking:
                 if seatId != '0':
                     if SK.BookSeat(seatId, date, startTime, endTime) == 'Success':
