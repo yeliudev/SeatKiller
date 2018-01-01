@@ -235,6 +235,14 @@ class SeatKiller(object):
         try_picking = True
         date = datetime.date.today()
         date = date.strftime('%Y-%m-%d')
+        if buildingId == '2':
+            rooms = SK.gt
+        elif buildingId == '3':
+            rooms = SK.yt
+        elif buildingId == '4':
+            rooms = SK.zt
+        else:
+            rooms = SK.xt
         while try_picking:
             self.freeSeats = []
             if SK.GetToken():
@@ -299,9 +307,9 @@ if __name__ == '__main__':
         SK.to_addr = input('请输入邮箱地址，抢座成功之后将发送邮件提醒（若不需要邮件提醒，此项可放空）：')
         mail_addr = r'^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}$'
         if re.match(mail_addr, SK.to_addr):
-            print('\n邮箱地址正确，可以发送邮件提醒')
+            print('邮箱地址正确，可以发送邮件提醒')
         else:
-            print('\n邮箱地址有误，无法发送邮件提醒')
+            print('邮箱地址有误，无法发送邮件提醒')
             SK.to_addr = False
 
         if input('是否进入捡漏模式（1.是 2.否）：') == '1':
