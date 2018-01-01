@@ -27,7 +27,7 @@ if input('请选择信息输入模式（1.自动 2.手动）：') == '1':
     rooms = SK.xt2
     SK.to_addr = '879316283@qq.com'
     if input('是否进入捡漏模式（1.是 2.否）：') == '1':
-        SK.Loop(buildingId, startTime, endTime)
+        SK.Loop(buildingId, rooms, startTime, endTime)
         sys.exit()
 else:
     buildingId = input('请输入分馆编号（1.信息科学分馆 2.工学分馆 3.医学分馆 4.总馆）：')
@@ -61,7 +61,7 @@ else:
         SK.to_addr = False
 
     if input('是否进入捡漏模式（1.是 2.否）：') == '1':
-        SK.Loop(buildingId, startTime, endTime)
+        SK.Loop(buildingId, rooms, startTime, endTime)
         sys.exit()
     else:
         if buildingId == '1':
