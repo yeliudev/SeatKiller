@@ -22,9 +22,11 @@ class SeatKiller(object):
         self.layout_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/layoutByDate/'  # 单一区域座位信息API（拼接roomId+date）
         self.search_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/searchSeats/'  # 空位检索API（拼接date+startTime+endTime）
         self.book_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/freeBook'  # 座位预约API
+        self.cancel_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/cancel/'  # 取消预约API
 
         # 已预先爬取的roomId
         self.xt = ['6', '7', '8', '9', '10', '11', '12', '4', '5']
+        self.xt_less = ['6', '7', '8', '9', '10', '11', '12']
         self.xt2 = ['6', '7', '8', '9', '10', '11', '12']
         self.gt = ['19', '29', '31', '32', '33', '34', '35', '37', '38']
         self.yt = ['20', '21', '23', '24', '26', '27']
@@ -137,7 +139,7 @@ class SeatKiller(object):
             print('\nTry getting seat information...Status: Connection lost')
             return False
 
-    # 发起GET请求，检索某区域内指定时间段的空位，成功则返回True并将seatId存入freeSeats数组中，否则返回False
+    # 发起GET请求，检索某区域内指定时间段的空位，成功则返回'Success'并将seatId存入freeSeats数组中，否则返回'Failed'，连接丢失则返回'Connection lost'
     def SearchFreeSeat(self, buildingId, roomId, date, startTime, endTime, batch='9999', page='1'):
         url = self.search_url + date + '/' + startTime + '/' + endTime
         datas = {'t': '1', 'roomId': roomId, 'buildingId': buildingId, 'batch': batch, 'page': page, 't2': '2'}
@@ -170,13 +172,32 @@ class SeatKiller(object):
                         print('\n\n邮件提醒已发送，若接收不到提醒，请将\'seatkiller@outlook.com\'添加至邮箱白名单')
                     else:
                         print('\n邮件发送失败')
-                return 'Success'
+                if json['data']['location'][12] == '3':
+                    return str(json['data']['id'])
+                else:
+                    return 'Success'
             else:
                 print(json)
                 return 'Failed'
         except:
             print('\nTry booking seat...Status: Connection lost')
             return 'Connection lost'
+
+    # 发起GET请求，取消指定id的座位预约，成功则返回True，否则返回False
+    def CancelReservation(self, id):
+        url = self.cancel_url + id
+        response = requests.get(url, headers=self.headers, verify=False)
+        try:
+            json = response.json()
+            print('\nTry cancelling reservation...Status: ' + str(json['status']))
+            if json['status'] == 'success':
+                return True
+            else:
+                print(json)
+                return False
+        except:
+            print('\nTry getting seat information...Status: Connection lost')
+            return False
 
     # 打印座位预约凭证
     def PrintBookInf(self, json):
@@ -229,10 +250,9 @@ class SeatKiller(object):
     # 捡漏模式
     def Loop(self, buildingId, rooms, startTime, endTime):
         print('\n-------------------------捡漏模式开始--------------------------')
-        try_picking = True
         date = datetime.date.today()
         date = date.strftime('%Y-%m-%d')
-        while try_picking:
+        while True:
             self.freeSeats = []
             if self.GetToken():
                 for i in rooms:
@@ -241,11 +261,12 @@ class SeatKiller(object):
                         time.sleep(60)
                 for freeSeatId in self.freeSeats:
                     response = self.BookSeat(freeSeatId, date, startTime, endTime)
-                    if response == 'Success':
-                        try_picking = False
-                        break
+                    if response[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] or response == 'Success':
+                        print('\n捡漏成功')
+                        print('\n-------------------------捡漏模式结束--------------------------')
+                        return response
                     elif response == 'Failed':
-                        time.sleep(5)
+                        time.sleep(3)
                         continue
                     else:
                         print('\n连接丢失，5分钟后尝试继续抢座')
@@ -254,12 +275,66 @@ class SeatKiller(object):
                 else:
                     ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
                     delta = ddl - datetime.datetime.now()
-                    print('\n循环结束，30秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
-                    time.sleep(30)
+                    print('\n循环结束，5秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
+                    time.sleep(5)
             else:
-                break
+                print('\n获取token失败，5分钟后再次尝试')
+                time.sleep(300)
 
             if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
                                                                     minute=0, second=0):
-                break
-        print('\n-------------------------捡漏模式结束--------------------------')
+                print('\n捡漏失败，超出运行时间')
+                print('\n-------------------------捡漏模式结束--------------------------')
+                return False
+
+    # 换座模式（限信息科学分馆）
+    def ExchangeLoop(self, buildingId, startTime, endTime, id):
+        print('\n-------------------------换座模式开始--------------------------')
+        date = datetime.date.today()
+        date = date.strftime('%Y-%m-%d')
+        cancel = False
+        cancelled = False
+        while True:
+            self.freeSeats = []
+            if self.GetToken():
+                for i in self.xt_less:
+                    res = self.SearchFreeSeat(buildingId, i, date, startTime, endTime)
+                    if res == 'Success' and not cancelled:
+                        cancel = True
+                    elif res == 'Connection lost':
+                        print('\n连接丢失，1分钟后尝试继续检索空位')
+                        time.sleep(60)
+                if cancel:
+                    cancel = False
+                    if self.CancelReservation(id):
+                        cancelled = True
+                for freeSeatId in self.freeSeats:
+                    response = self.BookSeat(freeSeatId, date, startTime, endTime)
+                    if response == 'Success':
+                        print('\n换座成功')
+                        print('\n-------------------------换座模式结束--------------------------')
+                        return True
+                    elif response == 'Failed':
+                        time.sleep(3)
+                        continue
+                    else:
+                        print('\n连接丢失，5分钟后尝试继续抢座')
+                        time.sleep(300)
+                        continue
+                else:
+                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
+                    delta = ddl - datetime.datetime.now()
+                    print('\n循环结束，5秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
+                    time.sleep(5)
+            else:
+                print('\n获取token失败，5分钟后再次尝试')
+                time.sleep(300)
+
+            if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
+                                                                    minute=30, second=0):
+                if cancelled:
+                    print('\n换座失败，原座位已丢失')
+                else:
+                    print('\n换座失败，原座位未丢失')
+                print('\n-------------------------换座模式结束--------------------------')
+                return False
