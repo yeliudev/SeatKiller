@@ -324,8 +324,8 @@ class SeatKiller(object):
                 else:
                     ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
                     delta = ddl - datetime.datetime.now()
-                    print('\n循环结束，5秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
-                    time.sleep(5)
+                    print('\n循环结束，10秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
+                    time.sleep(10)
             else:
                 print('\n获取token失败，5分钟后再次尝试')
                 time.sleep(300)
