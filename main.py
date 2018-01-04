@@ -24,7 +24,7 @@ if input('请选择信息输入模式（1.自动 2.手动）：') == '1':
     seatId = '7469'
     startTime = '480'
     endTime = '1320'
-    rooms = SK.xt2
+    rooms = SK.xt_less
     exchange = True
     SK.to_addr = '879316283@qq.com'
     if input('是否进入捡漏模式（1.是 2.否）：') == '1':
