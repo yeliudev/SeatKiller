@@ -18,19 +18,34 @@ password = getpass.getpass('请输入图书馆密码：')
 
 SK = SeatKiller.SeatKiller(token, username, password)
 
-if input('请选择信息输入模式（1.自动 2.手动）：') == '1':
+if SK.GetToken():
+    SK.GetUsrInf()
+    id = SK.CheckResInf()
+    if id:
+        if input('\n是否取消此预约信息（1.是 2.否）：') == '1':
+            if not SK.CancelReservation(id):
+                print('\n取消预约失败，请稍等后重试')
+                sys.exit()
+else:
+    print('\n登陆失败，请稍等后重试')
+    sys.exit()
+
+mode = input('\n请选择信息输入模式（1.自动 2.手动 3.手动指定时间）：')
+if mode == '1':
     buildingId = '1'
     roomId = '0'
     seatId = '7469'
     startTime = '480'
     endTime = '1320'
-    rooms = SK.xt_less
+    rooms = SK.xt
     exchange = True
     SK.to_addr = '879316283@qq.com'
-    if input('是否进入捡漏模式（1.是 2.否）：') == '1':
-        SK.Loop(buildingId, rooms, startTime, endTime)
+    if input('\n是否进入捡漏模式（1.是 2.否）：') == '1':
+        response = SK.Loop(buildingId, rooms, startTime, endTime)
+        if response[0] in map(str, range(10)) and exchange:
+            SK.ExchangeLoop(buildingId, startTime, endTime, response)
         sys.exit()
-else:
+elif mode == '2':
     buildingId = input('请输入分馆编号（1.信息科学分馆 2.工学分馆 3.医学分馆 4.总馆）：')
     if buildingId == '1':
         rooms = SK.xt
@@ -72,7 +87,7 @@ else:
 
     if input('是否进入捡漏模式（1.是 2.否）：') == '1':
         response = SK.Loop(buildingId, rooms, startTime, endTime)
-        if response[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] and exchange:
+        if response[0] in map(str, range(10)) and exchange:
             SK.ExchangeLoop(buildingId, startTime, endTime, response)
         sys.exit()
     else:
@@ -127,14 +142,27 @@ else:
             seatId = '0'
         else:
             seatId = input('请输入座位ID（若由系统自动选择请输入\'0\'）：')
-
-if SK.GetToken():
-    SK.GetUsrInf()
 else:
-    running = False
+    buildingId = '1'
+    roomId = '0'
+    seatId = '7469'
+    rooms = SK.xt
+    exchange = True
+    SK.to_addr = '879316283@qq.com'
+    startTime = input('请输入开始时间（以分钟为单位，从0点开始计算）：')
+    endTime = input('请输入结束时间（以分钟为单位，从0点开始计算）：')
+    if input('是否进入捡漏模式（1.是 2.否）：') == '1':
+        response = SK.Loop(buildingId, rooms, startTime, endTime)
+        if response[0] in map(str, range(10)) and exchange:
+            SK.ExchangeLoop(buildingId, startTime, endTime, response)
+        sys.exit()
 
 while running:
-    SK.Wait(22, 14, 30)
+    if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=14, second=40):
+        print('\n------------------------准备获取token------------------------')
+        SK.Wait(22, 14, 40)
+    else:
+        print('\n------------------------开始获取token------------------------')
     try_booking = True
     date = datetime.date.today() + datetime.timedelta(days=1)
     date = date.strftime('%Y-%m-%d')
@@ -146,11 +174,20 @@ while running:
         if roomId != '0':
             SK.GetSeats(roomId, date)
 
-        SK.Wait(22, 15, 0)
+        if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=15, second=0):
+            SK.Wait(22, 15, 0)
+        elif datetime.datetime.now() > datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45,
+                                                                 second=0) and exchange:
+            print('\n预约系统开放时间已过，准备进入捡漏模式')
+            SK.Wait(0, 59, 59, nextDay=True)
+            response = SK.Loop(buildingId, rooms, startTime, endTime)
+            if response[0] in map(str, range(10)) and exchange:
+                SK.ExchangeLoop(buildingId, startTime, endTime, response)
+            sys.exit()
+        print('\n------------------------开始预约次日座位------------------------')
         while try_booking:
             if seatId != '0':
-                if SK.BookSeat(seatId, date, startTime, endTime)[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8',
-                                                                        '9']:
+                if SK.BookSeat(seatId, date, startTime, endTime)[0] in map(str, range(10)):
                     try_booking = False
                 else:
                     print('\n指定座位预约失败，尝试检索其他空位...')
@@ -177,11 +214,11 @@ while running:
                     if response == 'Success':
                         try_booking = False
                         break
-                    elif response[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] and exchange:
+                    elif response[0] in map(str, range(10)) and exchange:
                         try_booking = False
                         SK.ExchangeLoop(buildingId, startTime, endTime, response)
                         break
-                    elif response[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] and not exchange:
+                    elif response[0] in map(str, range(10)) and not exchange:
                         try_booking = False
                         break
                     elif response == 'Failed':
@@ -193,15 +230,13 @@ while running:
                         print('\n连接丢失，1分钟后重新尝试抢座，系统开放时间剩余' + str(delta.seconds) + '秒\n')
                         time.sleep(60)
                         continue
-                time.sleep(5)
+                time.sleep(3)
             else:
-                print('\n抢座失败，座位预约系统已关闭，2小时后尝试捡漏')
-                time.sleep(7200)
+                print('\n抢座失败，座位预约系统已关闭，开始尝试捡漏')
+                SK.Wait(0, 59, 59, nextDay=True)
                 response = SK.Loop(buildingId, rooms, startTime, endTime)
-                if response[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']:
+                if response[0] in map(str, range(10)) and exchange:
                     SK.ExchangeLoop(buildingId, startTime, endTime, response)
-                break
-        print('\n抢座运行结束')
-        time.sleep(3600)
+        print('\n抢座运行结束，等待下一轮循环')
     else:
         break

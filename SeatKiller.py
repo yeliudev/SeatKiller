@@ -14,13 +14,14 @@ from email.mime.text import MIMEText
 
 class SeatKiller(object):
 
-    def __init__(self, token, username, password):
+    def __init__(self, token, username='', password=''):
         self.login_url = 'https://seat.lib.whu.edu.cn:8443/rest/auth'  # 图书馆移动端登陆API
         self.usr_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/user'  # 用户信息API
         self.filters_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/free/filters'  # 分馆和区域信息API
         self.stats_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/stats2/'  # 单一分馆区域信息API（拼接buildingId）
         self.layout_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/layoutByDate/'  # 单一区域座位信息API（拼接roomId+date）
         self.search_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/searchSeats/'  # 空位检索API（拼接date+startTime+endTime）
+        self.check_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/history/1/10'  # 预约历史记录API
         self.book_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/freeBook'  # 座位预约API
         self.cancel_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/cancel/'  # 取消预约API
 
@@ -35,7 +36,6 @@ class SeatKiller(object):
         self.token = token
         self.username = username
         self.password = password
-        self.name = 'user'
         self.to_addr = False
         self.headers = {'Host': 'seat.lib.whu.edu.cn:8443',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
@@ -46,9 +46,13 @@ class SeatKiller(object):
                         'token': self.token,
                         'Accept-Encoding': 'gzip, deflate'}
 
-    # 暂停程序运行至指定时间，无返回值
-    def Wait(self, hour, minute, second):
-        time_run = datetime.datetime.replace(datetime.datetime.now(), hour=hour, minute=minute, second=second)
+    # 暂停程序至指定时间，无返回值
+    def Wait(self, hour, minute, second, nextDay=False):
+        if nextDay:
+            time_run = datetime.datetime.replace(datetime.datetime.now() + datetime.timedelta(days=1), hour=hour,
+                                                 minute=minute, second=second)
+        else:
+            time_run = datetime.datetime.replace(datetime.datetime.now(), hour=hour, minute=minute, second=second)
         delta = time_run - datetime.datetime.now()
         print('\n正在等待系统开放...剩余' + str(delta.seconds) + '秒')
         time.sleep(delta.seconds)
@@ -82,7 +86,6 @@ class SeatKiller(object):
             json = response.json()
             if json['status'] == 'success':
                 print('\n你好，' + json['data']['name'] + ' 上次登陆时间：' + json['data']['lastLogin'])
-                self.name = json['data']['name']
                 return True
             else:
                 print('\nTry getting user information...Status: fail')
@@ -120,6 +123,29 @@ class SeatKiller(object):
                 return False
         except:
             print('\nTry getting room information...Status: Connection lost')
+            return False
+
+    # 发起GET请求，获取当前的座位预约记录，若已有有效预约则返回预约id，否则返回False
+    def CheckResInf(self):
+        response = requests.get(self.check_url, headers=self.headers, verify=False)
+        try:
+            json = response.json()
+            print('\nTry getting reservation information...Status: ' + str(json['status']))
+            if json['status'] == 'success':
+                for reservation in json['data']['reservations']:
+                    if reservation['stat'] == 'RESERVE':
+                        print('\n---------------------已有有效预约----------------------')
+                        print('ID：' + str(reservation['id']))
+                        print('时间：' + reservation['date'] + ' ' + reservation['begin'] + '～' + reservation['end'])
+                        print('状态：预约')
+                        print('地址：' + reservation['loc'])
+                        print('-----------------------------------------------------')
+                        return str(reservation['id'])
+                return False
+            else:
+                return False
+        except:
+            print('\nTry getting building information...Status: Connection lost')
             return False
 
     # 发起GET请求，获取当前某区域内的位置信息，成功则返回json，否则返回False
@@ -256,29 +282,29 @@ class SeatKiller(object):
             if self.GetToken():
                 for i in rooms:
                     if self.SearchFreeSeat(buildingId, i, date, startTime, endTime) == 'Connection lost':
-                        print('\n连接丢失，1分钟后尝试继续检索空位')
-                        time.sleep(60)
+                        print('\n连接丢失，30秒后尝试继续检索空位')
+                        time.sleep(30)
                 for freeSeatId in self.freeSeats:
                     response = self.BookSeat(freeSeatId, date, startTime, endTime)
-                    if response[0] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'] or response == 'Success':
+                    if response[0] in map(str, range(10)) or response == 'Success':
                         print('\n捡漏成功')
                         print('\n-------------------------捡漏模式结束--------------------------')
                         return response
                     elif response == 'Failed':
-                        time.sleep(3)
+                        time.sleep(1)
                         continue
                     else:
-                        print('\n连接丢失，5分钟后尝试继续抢座')
-                        time.sleep(300)
+                        print('\n连接丢失，1分钟后尝试继续抢座')
+                        time.sleep(60)
                         continue
                 else:
                     ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
                     delta = ddl - datetime.datetime.now()
-                    print('\n循环结束，5秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
-                    time.sleep(5)
+                    print('\n循环结束，3秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
+                    time.sleep(3)
             else:
-                print('\n获取token失败，5分钟后再次尝试')
-                time.sleep(300)
+                print('\n获取token失败，1分钟后再次尝试')
+                time.sleep(60)
 
             if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
                                                                     minute=0, second=0):
@@ -301,8 +327,8 @@ class SeatKiller(object):
                     if res == 'Success' and not cancelled:
                         cancel = True
                     elif res == 'Connection lost':
-                        print('\n连接丢失，1分钟后尝试继续检索空位')
-                        time.sleep(60)
+                        print('\n连接丢失，30秒后尝试继续检索空位')
+                        time.sleep(30)
                 if cancel:
                     cancel = False
                     if self.CancelReservation(id):
@@ -314,20 +340,20 @@ class SeatKiller(object):
                         print('\n-------------------------换座模式结束--------------------------')
                         return True
                     elif response == 'Failed':
-                        time.sleep(3)
+                        time.sleep(1)
                         continue
                     else:
-                        print('\n连接丢失，5分钟后尝试继续抢座')
-                        time.sleep(300)
+                        print('\n连接丢失，1分钟后尝试继续抢座')
+                        time.sleep(60)
                         continue
                 else:
                     ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
                     delta = ddl - datetime.datetime.now()
-                    print('\n循环结束，10秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
-                    time.sleep(10)
+                    print('\n循环结束，3秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
+                    time.sleep(3)
             else:
-                print('\n获取token失败，5分钟后再次尝试')
-                time.sleep(300)
+                print('\n获取token失败，1分钟后再次尝试')
+                time.sleep(60)
 
             if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
                                                                     minute=30, second=0):
