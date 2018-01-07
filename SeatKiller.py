@@ -5,6 +5,7 @@ import requests
 import datetime
 import time
 import smtplib
+import sys
 from email.header import Header
 from email.mime.text import MIMEText
 
@@ -70,10 +71,7 @@ class SeatKiller(object):
                 print('token：' + json['data']['token'])
                 return json['data']['token']
             else:
-                if json['code'] == '13':
-                    print('登录失败: 用户名或密码不正确')
-                else:
-                    print(json)
+                print(json['message'])
                 return False
         except:
             print('\nTry getting token...Status: Connection lost')
@@ -85,8 +83,10 @@ class SeatKiller(object):
         try:
             json = response.json()
             if json['status'] == 'success':
-                print('\n你好，' + json['data']['name'] + ' 上次登陆时间：' + json['data']['lastLogin'] + ' 违约记录：' + str(
-                    json['data']['violationCount']) + '次')
+                print('\n你好，' + json['data']['name'] + ' 上次登陆时间：' + json['data']['lastLogin'].replace('T', ' ')
+                      .rstrip('.000') + ' 状态：' +
+                      ('已进入' + json['data']['lastInBuildingName'] + ' 入馆时间：' + json['data']['lastIn'] if json['data'][
+                          'checkedIn'] else '未入馆') + ' 违约记录：' + str(json['data']['violationCount']) + '次')
                 return True
             else:
                 print('\nTry getting user information...Status: fail')
@@ -135,7 +135,7 @@ class SeatKiller(object):
             if json['status'] == 'success':
                 for reservation in json['data']['reservations']:
                     if reservation['stat'] in ['RESERVE', 'CHECK_IN']:
-                        print('\n---------------------已有有效预约----------------------')
+                        print('\n--------------------已检测到有效预约---------------------')
                         print('ID：' + str(reservation['id']))
                         print('时间：' + reservation['date'] + ' ' + reservation['begin'] + '～' + reservation['end'])
                         if reservation['awayBegin'] and reservation['awayEnd']:
@@ -147,15 +147,17 @@ class SeatKiller(object):
                         print('-----------------------------------------------------')
 
                         if reservation['loc'][13] == 'C' and reservation['stat'] == 'RESERVE':
-                            if input('检测到该座位位于\'一楼3C创客空间\'，是否进入换座模式（1.是 2.否）：') == '1':
+                            if input('该座位位于\'一楼3C创客空间\'，是否进入换座模式（1.是 2.否）：') == '1':
                                 self.ExchangeLoop(
                                     str(int(reservation['begin'][:2]) * 60 + int(reservation['begin'][-2:])),
                                     str(int(reservation['end'][:2]) * 60 + int(reservation['end'][-2:])),
                                     str(reservation['id']))
+                                sys.exit()
 
                         return str(reservation['id'])
                 return False
             else:
+                print('\n未检测到有效预约')
                 return False
         except:
             print('\nTry getting building information...Status: Connection lost')

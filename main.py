@@ -30,7 +30,6 @@ if SK.GetToken():
         else:
             enableLoop = False
 else:
-    print('\n登陆失败，请稍等后重试')
     sys.exit()
 
 mode = input('\n请选择信息输入模式（1.自动 2.手动 3.手动指定时间）：')
@@ -47,7 +46,7 @@ if mode == '1':
         if input('\n是否进入捡漏模式（1.是 2.否）：') == '1':
             response = SK.Loop(buildingId, rooms, startTime, endTime)
             if response[0] in map(str, range(10)) and exchange:
-                SK.ExchangeLoop(buildingId, startTime, endTime, response)
+                SK.ExchangeLoop(startTime, endTime, response)
             sys.exit()
 elif mode == '2':
     buildingId = input('请输入分馆编号（1.信息科学分馆 2.工学分馆 3.医学分馆 4.总馆）：')
@@ -260,7 +259,7 @@ while running:
                 SK.Wait(0, 59, 59, nextDay=True)
                 response = SK.Loop(buildingId, rooms, startTime, endTime)
                 if response[0] in map(str, range(10)) and exchange:
-                    SK.ExchangeLoop(buildingId, startTime, endTime, response)
+                    SK.ExchangeLoop(startTime, endTime, response)
         print('\n抢座运行结束，等待下一轮循环')
     else:
-        break
+        time.sleep(5)
