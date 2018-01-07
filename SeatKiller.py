@@ -25,13 +25,14 @@ class SeatKiller(object):
         self.check_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/history/1/10'  # 预约历史记录API
         self.book_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/freeBook'  # 座位预约API
         self.cancel_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/cancel/'  # 取消预约API
+        self.stop_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/stop'  # 座位释放API
 
         # 已预先爬取的roomId
-        self.xt = ['6', '7', '8', '9', '10', '11', '12', '4', '5']
-        self.xt_less = ['6', '7', '8', '9', '10', '11', '12']
-        self.gt = ['19', '29', '31', '32', '33', '34', '35', '37', '38']
-        self.yt = ['20', '21', '23', '24', '26', '27']
-        self.zt = ['39', '40', '51', '52', '56', '59', '60', '61', '62', '65', '66']
+        self.xt = ('6', '7', '8', '9', '10', '11', '12', '4', '5')
+        self.xt_less = ('6', '7', '8', '9', '10', '11', '12')
+        self.gt = ('19', '29', '31', '32', '33', '34', '35', '37', '38')
+        self.yt = ('20', '21', '23', '24', '26', '27')
+        self.zt = ('39', '40', '51', '52', '56', '59', '60', '61', '62', '65', '66')
 
         self.freeSeats = []  # 用于储存空闲seatId的数组
         self.token = token
@@ -46,6 +47,7 @@ class SeatKiller(object):
                         'Accept-Language': 'zh-cn',
                         'token': self.token,
                         'Accept-Encoding': 'gzip, deflate'}
+        self.state = {'RESERVE': '预约', 'CHECK_IN': '履约中', 'AWAY': '暂离'}
 
     # 暂停程序至指定时间，无返回值
     def Wait(self, hour, minute, second, nextDay=False):
@@ -140,7 +142,7 @@ class SeatKiller(object):
             print('\nTry getting reservation information...Status: ' + str(json['status']))
             if json['status'] == 'success':
                 for reservation in json['data']['reservations']:
-                    if reservation['stat'] in ['RESERVE', 'CHECK_IN']:
+                    if reservation['stat'] in ['RESERVE', 'CHECK_IN', 'AWAY']:
                         print('\n--------------------已检测到有效预约---------------------')
                         print('ID：' + str(reservation['id']))
                         print('时间：' + reservation['date'] + ' ' + reservation['begin'] + '～' + reservation['end'])
@@ -148,7 +150,7 @@ class SeatKiller(object):
                             print('暂离时间：' + reservation['awayBegin'] + '～' + reservation['awayEnd'])
                         elif reservation['awayBegin'] and not reservation['awayEnd']:
                             print('暂离时间：' + reservation['awayBegin'])
-                        print('状态：' + ('预约' if reservation['stat'] == 'RESERVE' else '履约中'))
+                        print('状态：' + self.state.get(reservation['stat']))
                         print('地址：' + reservation['loc'])
                         print('------------------------------------------------------')
 
@@ -160,7 +162,7 @@ class SeatKiller(object):
                                     str(reservation['id']))
                                 sys.exit()
 
-                        return str(reservation['id'])
+                        return (str(reservation['id']) if reservation['stat'] == 'RESERVE' else 'using')
                 return False
             else:
                 print('\n未检测到有效预约')
@@ -243,6 +245,21 @@ class SeatKiller(object):
                 return False
         except:
             print('\nTry getting seat information...Status: Connection lost')
+            return False
+
+    # 发起GET请求，释放当前正在使用的座位，成功则返回True，否则返回False
+    def StopUsing(self):
+        response = requests.get(self.stop_url, headers=self.headers, verify=False)
+        try:
+            json = response.json()
+            print('\nTry getting releasing seat...Status: ' + str(json['status']))
+            if json['status'] == 'success':
+                return True
+            else:
+                print(json)
+                return False
+        except:
+            print('\nTry getting building information...Status: Connection lost')
             return False
 
     # 打印座位预约凭证
