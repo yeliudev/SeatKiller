@@ -118,7 +118,13 @@ class SeatKiller(object):
             json = response.json()
             print('\nTry getting room information...Status: ' + str(json['status']))
             if json['status'] == 'success':
-                return json
+                print('\n当前座位状态：')
+                for room in json['data']:
+                    print('\n' + room['room'] + '\n楼层：' + str(room['floor']) + '\n总座位数：' +
+                          str(room['totalSeats']) + '\n已预约：' + str(room['reserved']) +
+                          '\n正在使用：' + str(room['inUse']).ljust(3) + '\n暂离：' +
+                          str(room['away']) + '\n空闲：' + str(room['free']))
+                return True
             else:
                 print(json)
                 return False
@@ -144,7 +150,7 @@ class SeatKiller(object):
                             print('暂离时间：' + reservation['awayBegin'])
                         print('状态：' + ('预约' if reservation['stat'] == 'RESERVE' else '履约中'))
                         print('地址：' + reservation['loc'])
-                        print('-----------------------------------------------------')
+                        print('------------------------------------------------------')
 
                         if reservation['loc'][13] == 'C' and reservation['stat'] == 'RESERVE':
                             if input('该座位位于\'一楼3C创客空间\'，是否进入换座模式（1.是 2.否）：') == '1':

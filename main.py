@@ -179,7 +179,7 @@ else:
             sys.exit()
 
 while running:
-    if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=14, second=40):
+    if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=10, minute=14, second=40):
         print('\n------------------------准备获取token------------------------')
         SK.Wait(22, 14, 40)
     else:
