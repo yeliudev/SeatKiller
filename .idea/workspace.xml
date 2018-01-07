@@ -18,11 +18,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SeatKiller.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SeatKiller.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SeatKiller.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4353">
-              <caret line="261" column="81" lean-forward="true" selection-start-line="261" selection-start-column="81" selection-end-line="261" selection-end-column="81" />
+            <state relative-caret-position="580">
+              <caret line="386" column="30" lean-forward="true" selection-start-line="386" selection-start-column="30" selection-end-line="386" selection-end-column="30" />
               <folding>
                 <element signature="e#48#63#0" expanded="true" />
               </folding>
@@ -30,11 +30,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="30" column="30" lean-forward="true" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
+            <state relative-caret-position="2893">
+              <caret line="271" column="9" lean-forward="false" selection-start-line="271" selection-start-column="9" selection-end-line="271" selection-end-column="9" />
               <folding>
                 <element signature="e#48#65#0" expanded="true" />
               </folding>
@@ -126,6 +126,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
+      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -138,7 +139,6 @@
         </subPane>
       </pane>
       <pane id="Scope" />
-      <pane id="Scratches" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -746,22 +746,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/SeatKiller.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="30" column="30" lean-forward="true" selection-start-line="30" selection-start-column="30" selection-end-line="30" selection-end-column="30" />
+        <state relative-caret-position="580">
+          <caret line="386" column="30" lean-forward="true" selection-start-line="386" selection-start-column="30" selection-end-line="386" selection-end-column="30" />
           <folding>
-            <element signature="e#48#65#0" expanded="true" />
+            <element signature="e#48#63#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SeatKiller.py">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4353">
-          <caret line="261" column="81" lean-forward="true" selection-start-line="261" selection-start-column="81" selection-end-line="261" selection-end-column="81" />
+        <state relative-caret-position="2893">
+          <caret line="271" column="9" lean-forward="false" selection-start-line="271" selection-start-column="9" selection-end-line="271" selection-end-column="9" />
           <folding>
-            <element signature="e#48#63#0" expanded="true" />
+            <element signature="e#48#65#0" expanded="true" />
           </folding>
         </state>
       </provider>

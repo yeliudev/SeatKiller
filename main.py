@@ -186,7 +186,7 @@ else:
             sys.exit()
 
 while running:
-    if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=10, minute=14, second=40):
+    if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=14, second=40):
         print('\n------------------------准备获取token------------------------')
         SK.Wait(22, 14, 40)
     else:
@@ -267,6 +267,7 @@ while running:
                 response = SK.Loop(buildingId, rooms, startTime, endTime)
                 if response[0] in map(str, range(10)) and exchange:
                     SK.ExchangeLoop(startTime, endTime, response)
-        print('\n抢座运行结束，等待下一轮循环')
+        print('\n抢座运行结束，2小时后进入下一轮循环')
+        time.sleep(7200)
     else:
         time.sleep(5)

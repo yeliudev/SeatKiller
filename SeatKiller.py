@@ -387,7 +387,7 @@ class SeatKiller(object):
                 time.sleep(60)
 
             if datetime.datetime.now() >= datetime.datetime.replace(datetime.datetime.now(), hour=20,
-                                                                    minute=30, second=0):
+                                                                    minute=0, second=0):
                 if cancelled:
                     print('\n换座失败，原座位已丢失')
                 else:
