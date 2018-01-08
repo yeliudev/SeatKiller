@@ -154,8 +154,8 @@ class SeatKiller(object):
                         print('地址：' + reservation['loc'])
                         print('------------------------------------------------------')
 
-                        if reservation['loc'][13] == 'C' and reservation['stat'] == 'RESERVE':
-                            if input('该座位位于\'一楼3C创客空间\'，是否进入换座模式（1.是 2.否）：') == '1':
+                        if '3C创客空间' in reservation['loc'] and reservation['stat'] == 'RESERVE':
+                            if input('\n该座位位于\'一楼3C创客空间\'，是否进入换座模式（1.是 2.否）：') == '1':
                                 self.ExchangeLoop(
                                     str(int(reservation['begin'][:2]) * 60 + int(reservation['begin'][-2:])),
                                     str(int(reservation['end'][:2]) * 60 + int(reservation['end'][-2:])),
@@ -166,7 +166,7 @@ class SeatKiller(object):
                 print('\n未检测到有效预约')
                 return False
             else:
-                print('\n检测到有效预约失败')
+                print('\n检测有效预约失败')
                 return False
         except:
             print('\nTry getting building information...Status: Connection lost')
@@ -221,7 +221,7 @@ class SeatKiller(object):
                         print('\n\n邮件提醒已发送，若接收不到提醒，请将\'seatkiller@outlook.com\'添加至邮箱白名单')
                     else:
                         print('\n邮件提醒发送失败')
-                if json['data']['location'][12] == '3':
+                if '3C创客空间' in json['data']['location']:
                     return str(json['data']['id'])
                 else:
                     return 'Success'
