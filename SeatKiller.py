@@ -163,9 +163,10 @@ class SeatKiller(object):
                                 sys.exit()
 
                         return (str(reservation['id']) if reservation['stat'] == 'RESERVE' else 'using')
+                print('\n未检测到有效预约')
                 return False
             else:
-                print('\n未检测到有效预约')
+                print('\n检测到有效预约失败')
                 return False
         except:
             print('\nTry getting building information...Status: Connection lost')

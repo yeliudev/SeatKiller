@@ -21,21 +21,29 @@ SK = SeatKiller.SeatKiller(token, username, password)
 
 if SK.GetToken():
     SK.GetUsrInf()
-    res = SK.CheckResInf()
-    if res == 'using':
-        if input('\n是否释放此座位（1.是 2.否）：') == '1':
-            if not SK.StopUsing():
-                print('\n释放座位失败，请稍等后重试')
-                sys.exit()
+    checking = True
+    while checking:
+        res = SK.CheckResInf()
+        if res == 'using':
+            if input('\n是否释放此座位（1.是 2.否）：') == '1':
+                if not SK.StopUsing():
+                    print('\n释放座位失败，请稍等后重试')
+                    enableLoop = False
+                    checking = False
+            else:
+                enableLoop = False
+                checking = False
+        elif res:
+            if input('\n是否取消预约此座位（1.是 2.否）：') == '1':
+                if not SK.CancelReservation(res):
+                    print('\n预约取消失败，请稍等后重试')
+                    enableLoop = False
+                    checking = False
+            else:
+                enableLoop = False
+                checking = False
         else:
-            enableLoop = False
-    elif res:
-        if input('\n是否取消预约此座位（1.是 2.否）：') == '1':
-            if not SK.CancelReservation(res):
-                print('\n预约取消失败，请稍等后重试')
-                sys.exit()
-        else:
-            enableLoop = False
+            checking = False
 else:
     sys.exit()
 
