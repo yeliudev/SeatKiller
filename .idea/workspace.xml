@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="9c776a74-77d6-4bb4-a5cf-6c3855c3a3db" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/SeatKiller.py" afterPath="$PROJECT_DIR$/SeatKiller.py" />
+      <change beforePath="$PROJECT_DIR$/main.py" afterPath="$PROJECT_DIR$/main.py" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -17,11 +17,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="SeatKiller.py" pinned="false" current-in-tab="true">
+      <file leaf-file-name="SeatKiller.py" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/SeatKiller.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="443">
-              <caret line="324" column="46" lean-forward="true" selection-start-line="324" selection-start-column="46" selection-end-line="324" selection-end-column="46" />
+              <caret line="324" column="46" lean-forward="false" selection-start-line="324" selection-start-column="46" selection-end-line="324" selection-end-column="46" />
               <folding>
                 <element signature="e#48#63#0" expanded="true" />
               </folding>
@@ -29,11 +29,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.py" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.py" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/main.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="61">
-              <caret line="23" column="19" lean-forward="true" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
+            <state relative-caret-position="-205">
+              <caret line="225" column="51" lean-forward="false" selection-start-line="225" selection-start-column="51" selection-end-line="225" selection-end-column="51" />
               <folding>
                 <element signature="e#48#65#0" expanded="true" />
               </folding>
@@ -75,6 +75,8 @@
       <find>ExchangeLoop</find>
       <find>请稍后</find>
       <find>'C'</find>
+      <find>running</find>
+      <find>try_booking</find>
     </findStrings>
     <replaceStrings>
       <replace>fail</replace>
@@ -93,8 +95,8 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/../whu_library_seat_reservation/reserve_seat.py" />
-        <option value="$PROJECT_DIR$/main.py" />
         <option value="$PROJECT_DIR$/SeatKiller.py" />
+        <option value="$PROJECT_DIR$/main.py" />
       </list>
     </option>
   </component>
@@ -126,7 +128,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -138,6 +139,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scratches" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -746,22 +748,22 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/main.py">
+    <entry file="file://$PROJECT_DIR$/SeatKiller.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="61">
-          <caret line="23" column="19" lean-forward="true" selection-start-line="23" selection-start-column="19" selection-end-line="23" selection-end-column="19" />
+        <state relative-caret-position="443">
+          <caret line="324" column="46" lean-forward="false" selection-start-line="324" selection-start-column="46" selection-end-line="324" selection-end-column="46" />
           <folding>
-            <element signature="e#48#65#0" expanded="true" />
+            <element signature="e#48#63#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/SeatKiller.py">
+    <entry file="file://$PROJECT_DIR$/main.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="443">
-          <caret line="324" column="46" lean-forward="true" selection-start-line="324" selection-start-column="46" selection-end-line="324" selection-end-column="46" />
+        <state relative-caret-position="-205">
+          <caret line="225" column="51" lean-forward="false" selection-start-line="225" selection-start-column="51" selection-end-line="225" selection-end-column="51" />
           <folding>
-            <element signature="e#48#63#0" expanded="true" />
+            <element signature="e#48#65#0" expanded="true" />
           </folding>
         </state>
       </provider>

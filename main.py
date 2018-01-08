@@ -11,7 +11,6 @@ import sys
 
 warnings.filterwarnings('ignore')
 token = '75PLJJO8PV12084027'  # 预先移动端抓包获取
-running = True
 enableLoop = True
 
 username = input('请输入学号：')
@@ -21,29 +20,28 @@ SK = SeatKiller.SeatKiller(token, username, password)
 
 if SK.GetToken():
     SK.GetUsrInf()
-    checking = True
-    while checking:
+    while True:
         res = SK.CheckResInf()
         if res == 'using':
             if input('\n是否释放此座位（1.是 2.否）：') == '1':
                 if not SK.StopUsing():
                     print('\n释放座位失败，请稍等后重试')
                     enableLoop = False
-                    checking = False
+                    break
             else:
                 enableLoop = False
-                checking = False
+                break
         elif res:
             if input('\n是否取消预约此座位（1.是 2.否）：') == '1':
                 if not SK.CancelReservation(res):
                     print('\n预约取消失败，请稍等后重试')
                     enableLoop = False
-                    checking = False
+                    break
             else:
                 enableLoop = False
-                checking = False
+                break
         else:
-            checking = False
+            break
 else:
     sys.exit()
 
@@ -193,13 +191,12 @@ else:
                 SK.ExchangeLoop(startTime, endTime, response)
             sys.exit()
 
-while running:
+while True:
     if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=14, second=40):
         print('\n------------------------准备获取token------------------------')
         SK.Wait(22, 14, 40)
     else:
         print('\n------------------------开始获取token------------------------')
-    try_booking = True
     date = datetime.date.today() + datetime.timedelta(days=1)
     date = date.strftime('%Y-%m-%d')
     print('\ndate:' + date)
@@ -221,10 +218,10 @@ while running:
                 SK.ExchangeLoop(startTime, endTime, response)
             sys.exit()
         print('\n------------------------开始预约次日座位------------------------')
-        while try_booking:
+        while True:
             if seatId != '0':
                 if SK.BookSeat(seatId, date, startTime, endTime)[0] in map(str, range(10)):
-                    try_booking = False
+                    break
                 else:
                     print('\n指定座位预约失败，尝试检索其他空位...')
                     seatId = '0'
@@ -253,14 +250,11 @@ while running:
                 for freeSeatId in SK.freeSeats:
                     response = SK.BookSeat(freeSeatId, date, startTime, endTime)
                     if response == 'Success':
-                        try_booking = False
                         break
                     elif response[0] in map(str, range(10)) and exchange:
-                        try_booking = False
                         SK.ExchangeLoop(startTime, endTime, response)
                         break
                     elif response[0] in map(str, range(10)) and not exchange:
-                        try_booking = False
                         break
                     elif response == 'Failed':
                         time.sleep(2)
