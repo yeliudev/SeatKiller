@@ -4,10 +4,8 @@
 import requests
 import datetime
 import time
-import smtplib
 import sys
-from email.header import Header
-from email.mime.text import MIMEText
+import Mail
 
 
 # 需要额外安装requests模块（Terminal执行"pip3 install requests"）
@@ -217,7 +215,7 @@ class SeatKiller(object):
             if json['status'] == 'success':
                 self.PrintBookInf(json)
                 if self.to_addr:
-                    if self.SendMail(json):
+                    if Mail.SendMail(json, self.to_addr):
                         print('\n\n邮件提醒已发送，若接收不到提醒，请将\'seatkiller@outlook.com\'添加至邮箱白名单')
                     else:
                         print('\n邮件提醒发送失败')
@@ -272,37 +270,6 @@ class SeatKiller(object):
         print('状态：' + ('已签到' if json['data']['checkedIn'] else '预约'))
         print('地址：' + json['data']['location'])
         print('---------------------------------------------------')
-
-    # 邮件发送座位预约凭证
-    def SendMail(self, json):
-        try:
-            # 设置SMTP服务器及账号密码
-            from_addr = 'seatkiller@outlook.com'
-            password = 'simplebutunique2018'
-            smtp_server = 'smtp-mail.outlook.com'
-
-            # 构造邮件正文
-            text = '---------------------座位预约凭证----------------------' + '\nID：' + str(json['data']['id']) + '\n凭证号码：' + \
-                   json['data']['receipt'] + '\n时间：' + json['data']['onDate'] + ' ' + json['data']['begin'] + '～' + \
-                   json['data']['end'] + '\n状态：' + ('已签到' if json['data']['checkedIn'] else '预约') + '\n地址：' + \
-                   json['data']['location'] + '\n-----------------------------------------------------' + \
-                   '\n\nPowered by goolhanrry'
-
-            msg = MIMEText(text, 'plain', 'utf-8')
-            msg['From'] = 'SeatKiller' + ' <' + from_addr + '>'
-            msg['To'] = 'user' + ' <' + self.to_addr + '>'
-            msg['Subject'] = Header('座位预约成功', 'utf-8').encode()
-
-            # 发送邮件
-            server = smtplib.SMTP(smtp_server, 587)
-            server.set_debuglevel(1)
-            server.starttls()
-            server.login(from_addr, password)
-            server.sendmail(from_addr, self.to_addr, msg.as_string())
-            server.quit()
-            return True
-        except:
-            return False
 
     # 捡漏模式
     def Loop(self, buildingId, rooms, startTime, endTime):
