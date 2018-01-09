@@ -1,6 +1,8 @@
 # Byte-compiled / optimized / DLL files
 /__pycache__/
 /venv/
+/.idea/
+/.vs/
 *.py[cod]
 *$py.class
 !Mail.pyc
