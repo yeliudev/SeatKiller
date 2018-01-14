@@ -6,10 +6,10 @@ import datetime
 import time
 import sys
 import random
+import Mail
 
 
 # 需要额外安装requests模块（Terminal执行"pip3 install requests"）
-
 
 class SeatKiller(object):
 
@@ -32,6 +32,7 @@ class SeatKiller(object):
         self.yt = ('20', '21', '23', '24', '26', '27')
         self.zt = ('39', '40', '51', '52', '56', '59', '60', '61', '62', '65', '66')
 
+        self.allSeats = {}  # 用于储存某区域的所有座位信息
         self.freeSeats = []  # 用于储存空闲seatId的数组
         self.token = token
         self.username = username
@@ -178,7 +179,12 @@ class SeatKiller(object):
             json = response.json()
             print('\nTry getting seat information...Status: ' + str(json['status']))
             if json['status'] == 'success':
-                return json
+                self.allSeats = {}
+                for seat in json['data']['layout']:
+                    if json['data']['layout'][seat]['type'] == 'seat':
+                        self.allSeats[json['data']['layout'][seat]['name']] = str(json['data']['layout'][seat]['id'])
+                self.allSeats = sorted(self.allSeats.keys())
+                return True
             else:
                 print(json)
                 return False

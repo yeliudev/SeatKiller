@@ -8,10 +8,12 @@ import datetime
 import time
 import re
 import sys
+import random
 
 warnings.filterwarnings('ignore')
 token = '75PLJJO8PV12084027'  # 预先移动端抓包获取
 enableLoop = True
+exchange = False
 
 username = input('请输入学号：')
 password = getpass.getpass('请输入图书馆密码：')
@@ -60,7 +62,7 @@ if mode == '1':
         sys.exit()
 
     endTime = input('请输入结束时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
-    if endTime not in map(str, range(510, 1350, 30)):
+    if endTime not in map(str, range(int(startTime), 1350, 30)):
         print('\n结束时间输入不合法，程序退出')
         sys.exit()
 
@@ -76,25 +78,18 @@ else:
         rooms = SK.xt
         if input('若抢到的座位位于\'一楼3C创客空间\'，是否尝试换座（1.是 2.否）：') == '1':
             exchange = True
-        else:
-            exchange = False
     elif buildingId == '2':
         rooms = SK.gt
-        exchange = False
     elif buildingId == '3':
         rooms = SK.yt
-        exchange = False
     elif buildingId == '4':
         rooms = SK.zt
-        exchange = False
     else:
         print('分馆编号输入不合法，已默认设置为\'信息科学分馆\'')
         buildingId = '1'
         rooms = SK.xt
         if input('若抢到的座位位于\'一楼3C创客空间\'，是否尝试换座（1.是 2.否）：') == '1':
             exchange = True
-        else:
-            exchange = False
 
     startTime = input('请输入开始时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
     if startTime not in map(str, range(480, 1320, 30)):
@@ -102,7 +97,7 @@ else:
         sys.exit()
 
     endTime = input('请输入结束时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
-    if endTime not in map(str, range(510, 1350, 30)):
+    if endTime not in map(str, range(int(startTime), 1350, 30)):
         print('\n结束时间输入不合法，程序退出')
         sys.exit()
 
@@ -174,7 +169,15 @@ else:
     if roomId == '0':
         seatId = '0'
     else:
-        seatId = input('请输入座位ID（若由系统自动选择请输入\'0\'）：')
+        date = datetime.date.today()
+        date = date.strftime('%Y-%m-%d')
+        if SK.GetSeats(roomId, date):
+            seatName = input('请输入座位ID（范围：' + min(SK.allSeats) + '～' + max(SK.allSeats) + ' 若由系统自动选择请输入\'0\'）：')
+            seatId = SK.allSeats.get(seatName)
+            print(seatId)
+        else:
+            print('座位ID输入有误，将由系统自动选择')
+            seatId = '0'
 
 while True:
     try_booking = True
