@@ -172,9 +172,9 @@ else:
         date = datetime.date.today()
         date = date.strftime('%Y-%m-%d')
         if SK.GetSeats(roomId, date):
-            seatName = input('请输入座位ID（范围：' + min(SK.allSeats) + '～' + max(SK.allSeats) + ' 若由系统自动选择请输入\'0\'）：')
+            seatName = input(
+                '请输入座位ID（范围：' + min(SK.allSeats.keys()) + '～' + max(SK.allSeats.keys()) + ' 若由系统自动选择请输入\'0\'）：')
             seatId = SK.allSeats.get(seatName)
-            print(seatId)
         else:
             print('座位ID输入有误，将由系统自动选择')
             seatId = '0'

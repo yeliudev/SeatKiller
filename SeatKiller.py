@@ -183,7 +183,6 @@ class SeatKiller(object):
                 for seat in json['data']['layout']:
                     if json['data']['layout'][seat]['type'] == 'seat':
                         self.allSeats[json['data']['layout'][seat]['name']] = str(json['data']['layout'][seat]['id'])
-                self.allSeats = sorted(self.allSeats.keys())
                 return True
             else:
                 print(json)
