@@ -5,7 +5,7 @@ import requests
 import datetime
 import time
 import sys
-import Mail
+import random
 
 
 # 需要额外安装requests模块（Terminal执行"pip3 install requests"）
@@ -290,14 +290,14 @@ class SeatKiller(object):
                         print('\n-------------------------捡漏模式结束--------------------------')
                         return response
                     elif response == 'Failed':
-                        time.sleep(1)
+                        time.sleep(random.uniform(1, 3))
                         continue
                     else:
                         print('\n连接丢失，1分钟后尝试继续抢座')
                         time.sleep(60)
                         continue
                 else:
-                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
+                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=20, minute=0, second=0)
                     delta = ddl - datetime.datetime.now()
                     print('\n循环结束，3秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
                     time.sleep(3)
@@ -312,9 +312,12 @@ class SeatKiller(object):
                 return False
 
     # 换座模式（限信息科学分馆）
-    def ExchangeLoop(self, startTime, endTime, id):
+    def ExchangeLoop(self, startTime, endTime, id, nextDay=False):
         print('\n-------------------------换座模式开始--------------------------')
-        date = datetime.date.today()
+        if nextDay:
+            date = datetime.date.today() + datetime.timedelta(days=1)
+        else:
+            date = datetime.date.today()
         date = date.strftime('%Y-%m-%d')
         cancel = False
         cancelled = False
@@ -339,14 +342,14 @@ class SeatKiller(object):
                         print('\n-------------------------换座模式结束--------------------------')
                         return True
                     elif response == 'Failed':
-                        time.sleep(1)
+                        time.sleep(random.uniform(1, 3))
                         continue
                     else:
                         print('\n连接丢失，1分钟后尝试继续抢座')
                         time.sleep(60)
                         continue
                 else:
-                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=19, minute=0, second=0)
+                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=20, minute=0, second=0)
                     delta = ddl - datetime.datetime.now()
                     print('\n循环结束，3秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
                     time.sleep(3)

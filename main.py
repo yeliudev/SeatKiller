@@ -45,23 +45,32 @@ if SK.GetToken():
 else:
     sys.exit()
 
-mode = input('\n请选择信息输入模式（1.自动 2.手动 3.手动指定时间）：')
+mode = input('\n请选择信息输入模式（1.自动 2.手动）：')
 if mode == '1':
     buildingId = '1'
     roomId = '0'
     seatId = '7469'
-    startTime = '510'
-    endTime = '1320'
     rooms = SK.xt
     exchange = True
     SK.to_addr = '879316283@qq.com'
+
+    startTime = input('请输入开始时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
+    if startTime not in map(str, range(480, 1320, 30)):
+        print('\n开始时间输入不合法，程序退出')
+        sys.exit()
+
+    endTime = input('请输入结束时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
+    if endTime not in map(str, range(510, 1350, 30)):
+        print('\n结束时间输入不合法，程序退出')
+        sys.exit()
+
     if enableLoop:
-        if input('\n是否进入捡漏模式（1.是 2.否）：') == '1':
+        if input('是否进入捡漏模式（1.是 2.否）：') == '1':
             response = SK.Loop(buildingId, rooms, startTime, endTime)
             if response[0] in map(str, range(10)) and exchange:
                 SK.ExchangeLoop(startTime, endTime, response)
             sys.exit()
-elif mode == '2':
+else:
     buildingId = input('请输入分馆编号（1.信息科学分馆 2.工学分馆 3.医学分馆 4.总馆）：')
     if buildingId == '1':
         rooms = SK.xt
@@ -166,32 +175,9 @@ elif mode == '2':
         seatId = '0'
     else:
         seatId = input('请输入座位ID（若由系统自动选择请输入\'0\'）：')
-else:
-    buildingId = '1'
-    roomId = '0'
-    seatId = '7469'
-    rooms = SK.xt
-    exchange = True
-    SK.to_addr = '879316283@qq.com'
-
-    startTime = input('请输入开始时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
-    if startTime not in map(str, range(480, 1320, 30)):
-        print('\n开始时间输入不合法，程序退出')
-        sys.exit()
-
-    endTime = input('请输入结束时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
-    if endTime not in map(str, range(510, 1350, 30)):
-        print('\n结束时间输入不合法，程序退出')
-        sys.exit()
-
-    if enableLoop:
-        if input('是否进入捡漏模式（1.是 2.否）：') == '1':
-            response = SK.Loop(buildingId, rooms, startTime, endTime)
-            if response[0] in map(str, range(10)) and exchange:
-                SK.ExchangeLoop(startTime, endTime, response)
-            sys.exit()
 
 while True:
+    try_booking = True
     if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=14, second=40):
         print('\n------------------------准备获取token------------------------')
         SK.Wait(22, 14, 40)
@@ -218,9 +204,9 @@ while True:
                 SK.ExchangeLoop(startTime, endTime, response)
             sys.exit()
         print('\n------------------------开始预约次日座位------------------------')
-        while True:
+        while try_booking:
             if seatId != '0':
-                if SK.BookSeat(seatId, date, startTime, endTime)[0] in map(str, range(10)):
+                if SK.BookSeat(seatId, date, startTime, endTime) not in ('Failed', 'Connection lost'):
                     break
                 else:
                     print('\n指定座位预约失败，尝试检索其他空位...')
@@ -243,21 +229,24 @@ while True:
                                 time.sleep(30)
 
                 if not SK.freeSeats:
-                    print('\n当前全馆暂无空位，3秒后尝试继续检索空位')
-                    time.sleep(3)
+                    print('\n当前全馆暂无空位，3-5秒后尝试继续检索空位')
+                    time.sleep(random.uniform(3, 5))
                     continue
 
                 for freeSeatId in SK.freeSeats:
                     response = SK.BookSeat(freeSeatId, date, startTime, endTime)
                     if response == 'Success':
+                        try_booking = False
                         break
                     elif response[0] in map(str, range(10)) and exchange:
-                        SK.ExchangeLoop(startTime, endTime, response)
+                        SK.ExchangeLoop(startTime, endTime, response, nextDay=True)
+                        try_booking = False
                         break
                     elif response[0] in map(str, range(10)) and not exchange:
+                        try_booking = False
                         break
                     elif response == 'Failed':
-                        time.sleep(2)
+                        time.sleep(random.uniform(1, 3))
                     else:
                         ddl = datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45, second=0)
                         delta = ddl - datetime.datetime.now()
@@ -272,4 +261,5 @@ while True:
         print('\n抢座运行结束，2小时后进入下一轮循环')
         time.sleep(7200)
     else:
+        print('\n登录失败，等待5秒后重试')
         time.sleep(5)
