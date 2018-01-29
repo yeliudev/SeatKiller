@@ -15,37 +15,38 @@ token = '75PLJJO8PV12084027'  # 预先移动端抓包获取
 enableLoop = True
 exchange = False
 
-username = input('请输入学号：')
-password = getpass.getpass('请输入图书馆密码：')
+while True:
+    username = input('请输入学号：')
+    password = getpass.getpass('请输入图书馆密码：')
 
-SK = SeatKiller.SeatKiller(token, username, password)
+    SK = SeatKiller.SeatKiller(token, username, password)
 
-if SK.GetToken():
-    SK.GetUsrInf()
-    while True:
-        res = SK.CheckResInf()
-        if res == 'using':
-            if input('\n是否释放此座位（1.是 2.否）：') == '1':
-                if not SK.StopUsing():
-                    print('\n释放座位失败，请稍等后重试')
-                    enableLoop = False
-                    break
-            else:
-                enableLoop = False
-                break
-        elif res:
-            if input('\n是否取消预约此座位（1.是 2.否）：') == '1':
-                if not SK.CancelReservation(res):
-                    print('\n预约取消失败，请稍等后重试')
-                    enableLoop = False
-                    break
-            else:
+    if SK.GetToken():
+        SK.GetUsrInf()
+        break
+
+while True:
+    res = SK.CheckResInf()
+    if res == 'using':
+        if input('\n是否释放此座位（1.是 2.否）：') == '1':
+            if not SK.StopUsing():
+                print('\n释放座位失败，请稍等后重试')
                 enableLoop = False
                 break
         else:
+            enableLoop = False
             break
-else:
-    sys.exit()
+    elif res:
+        if input('\n是否取消预约此座位（1.是 2.否）：') == '1':
+            if not SK.CancelReservation(res):
+                print('\n预约取消失败，请稍等后重试')
+                enableLoop = False
+                break
+        else:
+            enableLoop = False
+            break
+    else:
+        break
 
 mode = input('\n请选择信息输入模式（1.自动 2.手动）：')
 if mode == '1':

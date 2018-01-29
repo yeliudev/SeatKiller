@@ -6,7 +6,7 @@ import datetime
 import time
 import sys
 import random
-import Mail
+import socket
 
 
 # 需要额外安装requests模块（Terminal执行"pip3 install requests"）
@@ -220,8 +220,8 @@ class SeatKiller(object):
             if json['status'] == 'success':
                 self.PrintBookInf(json)
                 if self.to_addr:
-                    if Mail.SendMail(json, self.to_addr):
-                        print('\n\n邮件提醒已发送，若接收不到提醒，请将\'seatkiller@outlook.com\'添加至邮箱白名单')
+                    if self.SendMail(json):
+                        print('\n邮件提醒发送成功，若接收不到提醒，请将\'seatkiller@outlook.com\'添加至邮箱白名单')
                     else:
                         print('\n邮件提醒发送失败')
                 if '3C创客空间' in json['data']['location']:
@@ -275,6 +275,30 @@ class SeatKiller(object):
         print('状态：' + ('已签到' if json['data']['checkedIn'] else '预约'))
         print('地址：' + json['data']['location'])
         print('---------------------------------------------------')
+
+    def SendMail(self, json):
+        print('\n尝试连接邮件发送服务器...')
+        try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(15)
+            s.connect(('120.79.81.183', 9999))
+
+            s.send(bytes('json' + str(json), 'utf-8'))
+            print(s.recv(1024).decode('utf-8'))
+
+            s.send(bytes(self.to_addr, 'utf-8'))
+            print(s.recv(1024).decode('utf-8'))
+
+            print('正在尝试发送邮件提醒至\'' + self.to_addr + '\'...')
+            s.send(b'SendMail')
+            if s.recv(1024).decode('utf-8') == 'success':
+                s.send(b'exit')
+                s.close()
+                return True
+            else:
+                return False
+        except:
+            return False
 
     # 捡漏模式
     def Loop(self, buildingId, rooms, startTime, endTime):
