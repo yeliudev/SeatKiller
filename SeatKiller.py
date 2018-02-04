@@ -276,6 +276,7 @@ class SeatKiller(object):
         print('地址：' + json['data']['location'])
         print('---------------------------------------------------')
 
+    # 建立Socket套接字连接，将预约信息发送到邮件服务器
     def SendMail(self, json):
         print('\n尝试连接邮件发送服务器...')
         try:
