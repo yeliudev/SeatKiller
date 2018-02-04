@@ -284,6 +284,9 @@ class SeatKiller(object):
             s.settimeout(15)
             s.connect(('120.79.81.183', 5210))
 
+            if s.recv(1024).decode('utf-8') == 'Hello':
+                print('连接成功')
+
             s.send(bytes('json' + str(json), 'utf-8'))
             print(s.recv(1024).decode('utf-8'))
 
