@@ -26,8 +26,8 @@ class SeatKiller(object):
         self.stop_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/stop'  # 座位释放API
 
         # 已预先爬取的roomId
-        self.xt = ('6', '7', '8', '9', '10', '11', '12', '4', '5')
-        self.xt_less = ('6', '7', '8', '9', '10', '11', '12')
+        self.xt = ('6', '7', '8', '9', '10', '11', '12', '16', '4', '5', '14', '15')
+        self.xt_less = ('6', '7', '8', '9', '10', '11', '12', '16')
         self.gt = ('19', '29', '31', '32', '33', '34', '35', '37', '38')
         self.yt = ('20', '21', '23', '24', '26', '27')
         self.zt = ('39', '40', '51', '52', '56', '59', '60', '61', '62', '65', '66')
@@ -256,7 +256,7 @@ class SeatKiller(object):
         response = requests.get(self.stop_url, headers=self.headers, verify=False)
         try:
             json = response.json()
-            print('\nTry getting releasing seat...Status: ' + str(json['status']))
+            print('\nTry releasing seat...Status: ' + str(json['status']))
             if json['status'] == 'success':
                 return True
             else:
@@ -300,6 +300,8 @@ class SeatKiller(object):
                 s.close()
                 return True
             else:
+                s.send(b'exit')
+                s.close()
                 return False
         except:
             return False
