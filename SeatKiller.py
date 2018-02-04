@@ -282,7 +282,7 @@ class SeatKiller(object):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.settimeout(15)
-            s.connect(('120.79.81.183', 9999))
+            s.connect(('120.79.81.183', 5210))
 
             s.send(bytes('json' + str(json), 'utf-8'))
             print(s.recv(1024).decode('utf-8'))
