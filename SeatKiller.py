@@ -20,9 +20,9 @@ class SeatKiller(object):
         self.stats_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/stats2/'  # 单一分馆区域信息API（拼接buildingId）
         self.layout_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/layoutByDate/'  # 单一区域座位信息API（拼接roomId+date）
         self.search_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/searchSeats/'  # 空位检索API（拼接date+startTime+endTime）
-        self.check_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/history/1/10'  # 预约历史记录API
+        self.history_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/history/1/'  # 预约历史记录API（拼接历史记录个数）
         self.book_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/freeBook'  # 座位预约API
-        self.cancel_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/cancel/'  # 取消预约API
+        self.cancel_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/cancel/'  # 取消预约API（拼接预约ID）
         self.stop_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/stop'  # 座位释放API
 
         # 已预先爬取的roomId
@@ -135,7 +135,8 @@ class SeatKiller(object):
 
     # 发起GET请求，获取当前的座位预约记录，若已有有效预约则返回预约id，否则返回False
     def CheckResInf(self):
-        response = requests.get(self.check_url, headers=self.headers, verify=False)
+        url = self.history_url + '30'
+        response = requests.get(url, headers=self.headers, verify=False)
         try:
             json = response.json()
             print('\nTry getting reservation information...Status: ' + str(json['status']))
