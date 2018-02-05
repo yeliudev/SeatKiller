@@ -11,22 +11,22 @@ from email.mime.text import MIMEText
 
 
 # 发起get请求，尝试发送邮件提醒
-def SendMail(dict, to_addr, passwd):
+def SendMail(json, to_addr, passwd):
     try:
         # 设置SMTP服务器及账号密码
         from_addr = 'seatkiller@outlook.com'
         smtp_server = 'smtp-mail.outlook.com'
 
         # 构造邮件正文
-        text = '---------------------座位预约凭证----------------------' + '\nID：' + str(dict['data']['id']) + '\n凭证号码：' + \
-               dict['data']['receipt'] + '\n时间：' + dict['data']['onDate'] + ' ' + dict['data'][
+        text = '---------------------座位预约凭证----------------------' + '\nID：' + str(json['data']['id']) + '\n凭证号码：' + \
+               json['data']['receipt'] + '\n时间：' + json['data']['onDate'] + ' ' + json['data'][
                    'begin'] + '～' + \
-               dict['data']['end']
-        if dict['data']['checkedIn']:
+               json['data']['end']
+        if json['data']['checkedIn']:
             text = text + '\n状态：已签到'
         else:
             text = text + '\n状态：预约'
-        text = text + '\n地址：' + dict['data'][
+        text = text + '\n地址：' + json['data'][
             'location'] + '\n-----------------------------------------------------\n\nPowered by goolhanrry'
 
         msg = MIMEText(text, 'plain', 'utf-8')
@@ -38,7 +38,7 @@ def SendMail(dict, to_addr, passwd):
         server = smtplib.SMTP(smtp_server, 587)
         server.set_debuglevel(1)
         server.starttls()
-        server.login(from_addr, password)
+        server.login(from_addr, passwd)
         server.sendmail(from_addr, to_addr, msg.as_string())
         server.quit()
         return True
@@ -59,27 +59,30 @@ def tcplink(sock, addr, passwd):
                 break
 
             if str(data.decode('utf-8')) == 'SendMail':
-                if SendMail(dict, to_addr, passwd):
+                if SendMail(json, to_addr, passwd):
                     sock.send('success'.encode('utf-8'))
                     print('Success')
                 else:
                     sock.send('fail'.encode('utf-8'))
                     print('Failed')
             elif data.decode('utf-8')[0:4] == 'json':
-                print(data.decode('utf-8')[4:].replace('\'', '"'))
-                dict = eval(data.decode('utf-8')[4:])
+                decodedData = data.decode('utf-8')[4:].replace(': ', ':').replace(':', ': ').replace('false', 'False')
+                print(decodedData)
+                json = eval(decodedData)
                 sock.send('Get json file...'.encode('utf-8'))
             else:
                 to_addr = data.decode('utf-8')
                 print(data.decode('utf-8'))
-                sock.send('Get email address..'.encode('utf-8'))
+                sock.send('Get email address...'.encode('utf-8'))
 
         sock.close()
         print('Connection from %s:%s closed.' % addr)
     except:
+        print('Connection from %s:%s lost.' % addr)
         pass
 
-passwd=input('Passwd:')
+
+passwd = input('Passwd:')
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(('0.0.0.0', 5210))
 s.listen(10)
