@@ -5,7 +5,6 @@ import socket
 import smtplib
 import threading
 import time
-import json
 from email.header import Header
 from email.mime.text import MIMEText
 
