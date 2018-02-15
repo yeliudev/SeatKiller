@@ -5,7 +5,7 @@
 ![GitHub last commit](https://img.shields.io/github/last-commit/goolhanrry/SeatKiller.svg)
 [![GitHub repo size in bytes](https://img.shields.io/github/repo-size/goolhanrry/SeatKiller.svg?colorB=ff7e00#)](https://github.com/goolhanrry/SeatKiller)
 
-偶然发现图书馆的服务器没设防，于是写了这个小工具练练手，随缘更新，欢迎添加我的微信：`aweawds`交流讨论
+偶然发现图书馆的服务器没设防，于是写了这个小工具练练手，随缘更新，欢迎添加我的微信：`aweawds` 交流讨论
 
 用C#重写的GUI版本：[SeatKiller_UI](https://github.com/goolhanrry/SeatKiller_UI)
 
