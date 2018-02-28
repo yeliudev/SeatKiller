@@ -13,7 +13,7 @@ import socket
 
 class SeatKiller(object):
 
-    def __init__(self, token, username='', password=''):
+    def __init__(self, username='', password=''):
         self.login_url = 'https://seat.lib.whu.edu.cn:8443/rest/auth'  # 图书馆移动端登陆API
         self.usr_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/user'  # 用户信息API
         self.filters_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/free/filters'  # 分馆和区域信息API
@@ -34,7 +34,7 @@ class SeatKiller(object):
 
         self.allSeats = {}  # 用于储存某区域的所有座位信息
         self.freeSeats = []  # 用于储存空闲seatId的数组
-        self.token = token
+        self.token = ''
         self.username = username
         self.password = password
         self.to_addr = ''

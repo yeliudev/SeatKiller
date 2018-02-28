@@ -11,7 +11,6 @@ import sys
 import random
 
 warnings.filterwarnings('ignore')
-token = '75PLJJO8PV12084027'  # 预先移动端抓包获取
 enableLoop = True
 exchange = False
 
@@ -19,7 +18,7 @@ while True:
     username = input('请输入学号：')
     password = getpass.getpass('请输入图书馆密码：')
 
-    SK = SeatKiller.SeatKiller(token, username, password)
+    SK = SeatKiller.SeatKiller(username, password)
 
     if SK.GetToken():
         SK.GetUsrInf()
