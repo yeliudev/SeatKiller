@@ -62,10 +62,11 @@ class SeatKiller(object):
     # 发起GET请求，用旧token换取新token（旧token通过移动端抓包获得，可以保存后多次使用）并构建Headers，成功则返回token字符串，否则返回False
     def GetToken(self):
         datas = {'username': self.username, 'password': self.password}
-        response = requests.get(self.login_url, params=datas, headers=self.headers, verify=False)
+        print('\nTry getting token...Status: ', end='')
         try:
+            response = requests.get(self.login_url, params=datas, headers=self.headers, verify=False)
             json = response.json()
-            print('\nTry getting token...Status: ' + str(json['status']))
+            print(str(json['status']))
             if json['status'] == 'success':
                 self.token = json['data']['token']
                 self.headers['token'] = self.token
@@ -75,13 +76,13 @@ class SeatKiller(object):
                 print(json['message'])
                 return False
         except:
-            print('\nTry getting token...Status: Connection lost')
+            print('Connection lost')
             return False
 
     # 发起GET请求，获取用户信息并打印出来，成功则返回True，否则返回False
     def GetUsrInf(self):
-        response = requests.get(self.usr_url, headers=self.headers, verify=False)
         try:
+            response = requests.get(self.usr_url, headers=self.headers, verify=False)
             json = response.json()
             if json['status'] == 'success':
                 print('\n你好，' + json['data']['name'] + ' 上次登陆时间：' + json['data']['lastLogin'].replace('T', ' ')
@@ -90,7 +91,7 @@ class SeatKiller(object):
                           'checkedIn'] else '未入馆') + ' 违约记录：' + str(json['data']['violationCount']) + '次')
                 return True
             else:
-                print('\nTry getting user information...Status: fail')
+                print('\nTry getting user information...Status: failed')
                 return False
         except:
             print('\nTry getting user information...Status: Connection lost')
@@ -98,26 +99,28 @@ class SeatKiller(object):
 
     # 发起GET请求，获取全校图书馆的分馆和区域信息，成功则返回json，否则返回False
     def GetBuildings(self):
-        response = requests.get(self.filters_url, headers=self.headers, verify=False)
+        print('\nTry getting building information...Status: ', end='')
         try:
+            response = requests.get(self.filters_url, headers=self.headers, verify=False)
             json = response.json()
-            print('\nTry getting building information...Status: ' + str(json['status']))
+            print(str(json['status']))
             if json['status'] == 'success':
                 return json
             else:
                 print(json)
                 return False
         except:
-            print('\nTry getting building information...Status: Connection lost')
+            print('Connection lost')
             return False
 
     # 发起GET请求，获取当前某分馆各区域剩余的座位数，成功则返回json，否则返回False
     def GetRooms(self, buildingId):
         url = self.stats_url + buildingId
-        response = requests.get(url, headers=self.headers, verify=False)
+        print('\nTry getting room information...Status: ', end='')
         try:
+            response = requests.get(url, headers=self.headers, verify=False)
             json = response.json()
-            print('\nTry getting room information...Status: ' + str(json['status']))
+            print(str(json['status']))
             if json['status'] == 'success':
                 print('\n当前座位状态：')
                 for room in json['data']:
@@ -130,16 +133,17 @@ class SeatKiller(object):
                 print(json)
                 return False
         except:
-            print('\nTry getting room information...Status: Connection lost')
+            print('Connection lost')
             return False
 
     # 发起GET请求，获取当前的座位预约记录，若已有有效预约则返回预约id，否则返回False
     def CheckResInf(self):
         url = self.history_url + '30'
-        response = requests.get(url, headers=self.headers, verify=False)
+        print('\nTry getting reservation information...Status: ', end='')
         try:
+            response = requests.get(url, headers=self.headers, verify=False)
             json = response.json()
-            print('\nTry getting reservation information...Status: ' + str(json['status']))
+            print(str(json['status']))
             if json['status'] == 'success':
                 for reservation in json['data']['reservations']:
                     if reservation['stat'] in ['RESERVE', 'CHECK_IN', 'AWAY']:
@@ -169,16 +173,17 @@ class SeatKiller(object):
                 print('\n检测有效预约失败')
                 return False
         except:
-            print('\nTry getting building information...Status: Connection lost')
+            print('Connection lost')
             return False
 
     # 发起GET请求，获取当前某区域内的位置信息，成功则返回json，否则返回False
     def GetSeats(self, roomId, date):
         url = self.layout_url + roomId + '/' + date
-        response = requests.get(url, headers=self.headers, verify=False)
+        print('\nTry getting seat information...Status: ', end='')
         try:
+            response = requests.get(url, headers=self.headers, verify=False)
             json = response.json()
-            print('\nTry getting seat information...Status: ' + str(json['status']))
+            print(str(json['status']))
             if json['status'] == 'success':
                 self.allSeats = {}
                 for seat in json['data']['layout']:
@@ -189,35 +194,37 @@ class SeatKiller(object):
                 print(json)
                 return False
         except:
-            print('\nTry getting seat information...Status: Connection lost')
+            print('Connection lost')
             return False
 
     # 发起GET请求，检索某区域内指定时间段的空位，成功则返回'Success'并将seatId存入freeSeats数组中，否则返回'Failed'，连接丢失则返回'Connection lost'
     def SearchFreeSeat(self, buildingId, roomId, date, startTime, endTime, batch='9999', page='1'):
         url = self.search_url + date + '/' + startTime + '/' + endTime
         datas = {'t': '1', 'roomId': roomId, 'buildingId': buildingId, 'batch': batch, 'page': page, 't2': '2'}
-        response = requests.post(url, headers=self.headers, data=datas, verify=False)
+        print('\nTry searching for free seats in room ' + roomId + '...Status:', end='')
         try:
+            response = requests.post(url, headers=self.headers, data=datas, verify=False)
             json = response.json()
             if json['data']['seats'] != {}:
-                print('\nTry searching for free seats in room ' + roomId + '...Status: success')
+                print('success')
                 for num in json['data']['seats']:
                     self.freeSeats.append(json['data']['seats'][num]['id'])
                 return 'Success'
             else:
-                print('\nTry searching for free seats in room ' + roomId + '...Status: failed')
+                print('failed')
                 return 'Failed'
         except:
-            print('\nTry searching for free seats in room ' + roomId + '...Status: Connection lost')
+            print('Connection lost')
             return 'Connection lost'
 
     # 发起POST请求，尝试预定指定座位，成功则打印预定信息并返回'Success'，失败则返回'Failed'，连接丢失则返回'Connection lost'
     def BookSeat(self, seatId, date, startTime, endTime):
         datas = {'t': '1', 'startTime': startTime, 'endTime': endTime, 'seat': seatId, 'date': date, 't2': '2'}
-        response = requests.post(self.book_url, headers=self.headers, data=datas, verify=False)
+        print('\nTry booking seat...Status: ', end='')
         try:
+            response = requests.post(self.book_url, headers=self.headers, data=datas, verify=False)
             json = response.json()
-            print('\nTry booking seat...Status: ' + str(json['status']))
+            print(str(json['status']))
             if json['status'] == 'success':
                 self.PrintBookInf(json)
                 if self.to_addr:
@@ -233,38 +240,40 @@ class SeatKiller(object):
                 print(json)
                 return 'Failed'
         except:
-            print('\nTry booking seat...Status: Connection lost')
+            print('Connection lost')
             return 'Connection lost'
 
     # 发起GET请求，取消指定id的座位预约，成功则返回True，否则返回False
     def CancelReservation(self, id):
         url = self.cancel_url + id
-        response = requests.get(url, headers=self.headers, verify=False)
+        print('\nTry cancelling reservation...Status: ', end='')
         try:
+            response = requests.get(url, headers=self.headers, verify=False)
             json = response.json()
-            print('\nTry cancelling reservation...Status: ' + str(json['status']))
+            print(str(json['status']))
             if json['status'] == 'success':
                 return True
             else:
                 print(json)
                 return False
         except:
-            print('\nTry getting seat information...Status: Connection lost')
+            print('Connection lost')
             return False
 
     # 发起GET请求，释放当前正在使用的座位，成功则返回True，否则返回False
     def StopUsing(self):
-        response = requests.get(self.stop_url, headers=self.headers, verify=False)
+        print('\nTry releasing seat...Status: ', end='')
         try:
+            response = requests.get(self.stop_url, headers=self.headers, verify=False)
             json = response.json()
-            print('\nTry releasing seat...Status: ' + str(json['status']))
+            print(str(json['status']))
             if json['status'] == 'success':
                 return True
             else:
                 print(json)
                 return False
         except:
-            print('\nTry getting building information...Status: Connection lost')
+            print('Connection lost')
             return False
 
     # 打印座位预约凭证
