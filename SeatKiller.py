@@ -55,9 +55,12 @@ class SeatKiller(object):
                                                  minute=minute, second=second)
         else:
             time_run = datetime.datetime.replace(datetime.datetime.now(), hour=hour, minute=minute, second=second)
-        delta = time_run - datetime.datetime.now()
-        print('\n正在等待系统开放...剩余' + str(delta.seconds) + '秒')
-        time.sleep(delta.seconds)
+        print('\n', end='')
+        while True:
+            delta = time_run - datetime.datetime.now()
+            print('\r正在等待系统开放...剩余' + str(delta.total_seconds()) + '秒    ', end='')
+            if delta.total_seconds() <= 0:
+                break
 
     # 发起GET请求，用旧token换取新token（旧token通过移动端抓包获得，可以保存后多次使用）并构建Headers，成功则返回token字符串，否则返回False
     def GetToken(self):
