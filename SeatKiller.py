@@ -58,9 +58,11 @@ class SeatKiller(object):
         print('\n', end='')
         while True:
             delta = time_run - datetime.datetime.now()
-            print('\r正在等待系统开放...剩余' + str(delta.total_seconds()) + '秒    ', end='')
             if delta.total_seconds() <= 0:
+                print('\n', end='')
                 break
+            print('\r正在等待系统开放...剩余' + str(int(delta.total_seconds())) + '秒', end='    ')
+            time.sleep(0.05)
 
     # 发起GET请求，用旧token换取新token（旧token通过移动端抓包获得，可以保存后多次使用）并构建Headers，成功则返回token字符串，否则返回False
     def GetToken(self):
@@ -69,7 +71,7 @@ class SeatKiller(object):
         try:
             response = requests.get(self.login_url, params=datas, headers=self.headers, verify=False)
             json = response.json()
-            print(str(json['status']))
+            print(json['status'])
             if json['status'] == 'success':
                 self.token = json['data']['token']
                 self.headers['token'] = self.token
@@ -106,7 +108,7 @@ class SeatKiller(object):
         try:
             response = requests.get(self.filters_url, headers=self.headers, verify=False)
             json = response.json()
-            print(str(json['status']))
+            print(json['status'])
             if json['status'] == 'success':
                 return json
             else:
@@ -123,7 +125,7 @@ class SeatKiller(object):
         try:
             response = requests.get(url, headers=self.headers, verify=False)
             json = response.json()
-            print(str(json['status']))
+            print(json['status'])
             if json['status'] == 'success':
                 print('\n当前座位状态：')
                 for room in json['data']:
@@ -146,7 +148,7 @@ class SeatKiller(object):
         try:
             response = requests.get(url, headers=self.headers, verify=False)
             json = response.json()
-            print(str(json['status']))
+            print(json['status'])
             if json['status'] == 'success':
                 for reservation in json['data']['reservations']:
                     if reservation['stat'] in ['RESERVE', 'CHECK_IN', 'AWAY']:
@@ -186,7 +188,7 @@ class SeatKiller(object):
         try:
             response = requests.get(url, headers=self.headers, verify=False)
             json = response.json()
-            print(str(json['status']))
+            print(json['status'])
             if json['status'] == 'success':
                 self.allSeats = {}
                 for seat in json['data']['layout']:
@@ -227,7 +229,7 @@ class SeatKiller(object):
         try:
             response = requests.post(self.book_url, headers=self.headers, data=datas, verify=False)
             json = response.json()
-            print(str(json['status']))
+            print(json['status'])
             if json['status'] == 'success':
                 self.PrintBookInf(json)
                 if self.to_addr:
@@ -253,7 +255,7 @@ class SeatKiller(object):
         try:
             response = requests.get(url, headers=self.headers, verify=False)
             json = response.json()
-            print(str(json['status']))
+            print(json['status'])
             if json['status'] == 'success':
                 return True
             else:
@@ -269,7 +271,7 @@ class SeatKiller(object):
         try:
             response = requests.get(self.stop_url, headers=self.headers, verify=False)
             json = response.json()
-            print(str(json['status']))
+            print(json['status'])
             if json['status'] == 'success':
                 return True
             else:
