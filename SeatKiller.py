@@ -7,6 +7,7 @@ import time
 import sys
 import random
 import socket
+import json
 
 
 # 需要额外安装requests模块（Terminal执行"pip3 install requests"）
@@ -346,10 +347,11 @@ class SeatKiller(object):
         print('---------------------------------------------------')
 
     # 建立Socket套接字连接，将预约信息发送到邮件服务器
-    def SendMail(self, json):
-        json['username'] = self.username
-        json['name'] = self.name
-        json['client'] = 'python'
+    def SendMail(self, jsonCode):
+        jsonCode['username'] = self.username
+        jsonCode['name'] = self.name
+        jsonCode['client'] = 'python'
+        jsonCode['time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         print('\n尝试连接邮件发送服务器...')
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -359,7 +361,7 @@ class SeatKiller(object):
             if s.recv(1024).decode('utf-8') == 'Hello':
                 print('连接成功')
 
-            s.send(bytes('json' + str(json), 'utf-8'))
+            s.send(bytes('json' + str(json.dumps(jsonCode, ensure_ascii=False, indent=2)), 'utf-8'))
             print(s.recv(1024).decode('utf-8'))
 
             s.send(bytes(self.to_addr, 'utf-8'))

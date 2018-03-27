@@ -63,7 +63,7 @@ def tcplink(sock, addr, passwd):
                     print('\nMail Sent Successfully')
                 else:
                     sock.send('fail'.encode('utf-8'))
-                    print('Failed')
+                    print('\nFailed')
             elif data.decode('utf-8')[0:4] == 'json':
                 decodedData = data.decode('utf-8')[4:].replace(': ', ':').replace(':', ': ').replace('false', 'False')
                 print('\ndecodedData: ' + decodedData)
