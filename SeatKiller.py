@@ -434,9 +434,7 @@ class SeatKiller(object):
             if self.GetToken():
                 for i in rooms:
                     res = self.SearchFreeSeat(buildingId, i, date, startTime, endTime)
-                    if res == 'Success' and not cancelled:
-                        cancel = True
-                    elif res == 'Connection lost':
+                    if res == 'Connection lost':
                         print('\n连接丢失，30秒后尝试继续检索空位')
                         time.sleep(30)
                 for freeSeatId in self.freeSeats:
