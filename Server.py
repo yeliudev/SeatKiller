@@ -66,12 +66,12 @@ def tcplink(sock, addr, passwd):
                     print('Failed')
             elif data.decode('utf-8')[0:4] == 'json':
                 decodedData = data.decode('utf-8')[4:].replace(': ', ':').replace(':', ': ').replace('false', 'False')
-                print('decodedData: ' + decodedData)
+                print('\ndecodedData: ' + decodedData)
                 json = eval(decodedData)
                 sock.send('Get json file...'.encode('utf-8'))
             else:
                 to_addr = data.decode('utf-8')
-                print('To: ' + data.decode('utf-8'))
+                print('\nTo: ' + data.decode('utf-8') + '\n')
                 sock.send('Get email address...'.encode('utf-8'))
 
         sock.close()
