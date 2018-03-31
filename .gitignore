@@ -1,7 +1,5 @@
 # Byte-compiled / optimized / DLL files
 /__pycache__/
-.idea/
-.vs/
 *.py[cod]
 *$py.class
 
@@ -100,4 +98,5 @@ ENV/
 # mypy
 .mypy_cache/
 *.xml
-.vscode/settings.json
+
+.idea/
