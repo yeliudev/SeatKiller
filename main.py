@@ -49,44 +49,52 @@ while True:
     else:
         break
 
-buildingId = input('\n请输入分馆编号（1.信息科学分馆 2.工学分馆 3.医学分馆 4.总馆）：')
-if buildingId == '1':
-    rooms = SK.xt
-    if input('若抢到的座位位于\'一楼3C创客空间\'，是否尝试换座（1.是 2.否）：') == '1':
-        exchange = True
-elif buildingId == '2':
-    rooms = SK.gt
-elif buildingId == '3':
-    rooms = SK.yt
-elif buildingId == '4':
-    rooms = SK.zt
-else:
-    print('分馆编号输入不合法，已默认设置为\'信息科学分馆\'')
-    buildingId = '1'
-    rooms = SK.xt
-    if input('若抢到的座位位于\'一楼3C创客空间\'，是否尝试换座（1.是 2.否）：') == '1':
-        exchange = True
+while True:
+    buildingId = input('\n请输入分馆编号（1.信息科学分馆 2.工学分馆 3.医学分馆 4.总馆）：')
+    if buildingId == '1':
+        rooms = SK.xt
+        if input('若抢到的座位位于\'一楼3C创客空间\'，是否尝试换座（1.是 2.否）：') == '1':
+            exchange = True
+        break
+    elif buildingId == '2':
+        rooms = SK.gt
+        break
+    elif buildingId == '3':
+        rooms = SK.yt
+        break
+    elif buildingId == '4':
+        rooms = SK.zt
+        break
+    else:
+        print('分馆编号输入不合法')
 
-startTime = input('请输入开始时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
-if startTime not in map(str, range(480, 1320, 30)):
-    print('\n开始时间输入不合法，程序退出')
-    sys.exit()
 
-endTime = input('请输入结束时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
-if endTime not in map(str, range(int(startTime), 1350, 30)):
-    print('\n结束时间输入不合法，程序退出')
-    sys.exit()
+while True:
+    startTime = input('请输入开始时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
+    if startTime in map(str, range(480, 1321, 30)):
+        break
+    else:
+        print('开始时间输入不合法')
 
-SK.to_addr = input('请输入邮箱地址，抢座成功之后将发送邮件提醒（若不需要邮件提醒，此项可放空）：')
+while True:
+    endTime = input('请输入结束时间（以分钟为单位，从0点开始计算，以半小时为间隔）：')
+    if endTime in map(str, range(int(startTime), 1351, 30)):
+        break
+    else:
+        print('结束时间输入不合法')
+
 mail_addr = r'^[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+){0,4}$'
-if not SK.to_addr:
-    print('未输入邮箱地址，无法发送邮件提醒')
-    SK.to_addr = ''
-elif re.match(mail_addr, SK.to_addr):
-    print('邮箱地址正确，可以发送邮件提醒')
-else:
-    print('邮箱地址有误，无法发送邮件提醒')
-    SK.to_addr = ''
+while True:
+    SK.to_addr = input('请输入邮箱地址，抢座成功之后将发送邮件提醒（若不需要邮件提醒，此项可放空）：')
+    if not SK.to_addr:
+        print('未输入邮箱地址，将不发送邮件提醒')
+        SK.to_addr = ''
+        break
+    elif re.match(mail_addr, SK.to_addr):
+        print('邮箱地址正确，可以发送邮件提醒')
+        break
+    else:
+        print('邮箱地址有误')
 
 if enableLoop:
     if input('是否进入捡漏模式（1.是 2.否）：') == '1':
