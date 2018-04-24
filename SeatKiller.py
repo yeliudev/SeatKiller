@@ -96,7 +96,7 @@ class SeatKiller(object):
             json = response.json()
             if json['status'] == 'success':
                 self.name = json['data']['name']
-                print('\n你好，' + self.name + ' 上次登陆时间：' + json['data']['lastLogin'].replace('T', ' ')
+                print('\n你好，' + self.name + ' 上次入馆时间：' + json['data']['lastLogin'].replace('T', ' ')
                       .rstrip('.000') + ' 状态：' +
                       ('已进入' + json['data']['lastInBuildingName'] + ' 入馆时间：' + json['data']['lastIn'] if json['data'][
                           'checkedIn'] else '未入馆') + ' 违约记录：' + str(json['data']['violationCount']) + '次')
