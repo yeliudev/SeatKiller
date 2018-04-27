@@ -1,6 +1,6 @@
 # SeatKiller
 
-[![License](https://img.shields.io/badge/license-MIT-red.svg?colorB=D5283A#)](LICENSE)
+[![License](https://img.shields.io/badge/License-MPL--2.0-red.svg)](LICENSE)
 [![Language](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
 ![GitHub last commit](https://img.shields.io/github/last-commit/goolhanrry/SeatKiller.svg)
 [![GitHub repo size in bytes](https://img.shields.io/github/repo-size/goolhanrry/SeatKiller.svg?colorB=ff7e00#)](https://github.com/goolhanrry/SeatKiller)
