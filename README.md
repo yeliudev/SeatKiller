@@ -1,29 +1,6 @@
-# SeatKiller
+作者：凉的n次幂
+链接：https://www.zhihu.com/question/65496036/answer/281922125
+来源：知乎
+著作权归作者所有。商业转载请联系作者获得授权，非商业转载请注明出处。
 
-[![License](https://img.shields.io/badge/License-MPL--2.0-red.svg)](LICENSE)
-[![Language](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
-![GitHub last commit](https://img.shields.io/github/last-commit/goolhanrry/SeatKiller.svg)
-[![GitHub repo size in bytes](https://img.shields.io/github/repo-size/goolhanrry/SeatKiller.svg?colorB=ff7e00#)](https://github.com/goolhanrry/SeatKiller)
-
-偶然发现图书馆的服务器没设防，于是写了这个小工具练练手，随缘更新，欢迎添加我的微信：`aweawds` 交流讨论
-
-用C#重写的GUI版本：[SeatKiller_UI](https://github.com/goolhanrry/SeatKiller_UI)
-
-## 已经实现的功能
-
-* 获取用户的信息，包括姓名、当前状态（未入馆、已进入某分馆）和累计违约次数
-* 晚上22:15定时抢座（可自行选择是否指定区域、座位号）
-* 检测是否已有有效预约，区分状态（预约、履约中、暂离），并可取消或释放座位
-* 预约成功后连接邮件服务器发送邮件提醒
-* 捡漏模式可用于抢当天座位
-* 改签模式可用于在已有有效预约的情况下，更换座位或改签预约时间（如果空闲），确保新座位可用的情况下再释放原座位，防止座位丢失
-
-## 即将实现的功能
-
-* 暂无
-
-## 软件截图
-
-<p align="center">
-  <img with="999" height="666" src="https://github.com/goolhanrry/SeatKiller/blob/master/Screenshot/SeatKiller_Screenshot.png" alt="screenshot">
-</p>
+说实话某些人的丑恶嘴脸我是真不想说。用外挂还有理了？我就纳了闷了，你作为程序员就没点行业操守？天天不劳而获指着捡漏当寄生虫是什么行为？哦，写了代码就叫劳动了？呵呵呵，寄生虫为存活也努力了，照样还是寄生虫。还有不拿这当事儿的，当做练手的，某些院系的同学不妨想想这些行为的性质。用手段破坏公平竞争光彩？图书馆允许这样的行为？为了自己的利益就这么心安理得破坏别人的利益，那也恕我直言一句，用挂一时爽，后面半句您自己接上去吧。我必须挂人上去实在太丑恶了。这三观让我怀疑是不是华科派来捣乱的2333333（并无黑华科的意思），有本事您别匿名啊，您这么正确干嘛躲在阴暗的角落呢？&lt;img data-rawheight="1334" src="https://pic3.zhimg.com/50/v2-db7e3a006027e4f3d9b406d15ce9d2fa_hd.jpg" data-rawwidth="750" class="origin_image zh-lightbox-thumb" width="750" data-original="https://pic3.zhimg.com/v2-db7e3a006027e4f3d9b406d15ce9d2fa_r.jpg"&gt;凭自己本事句式系列啊，是啊，你凭自己本事杀个人是不是该怪那个人打不过你啊？买火车票之类的比喻简直就是无稽之谈，这性质能一样？这种无理取闹，胡搅蛮缠所谓胡说八道式比喻居然从这位的嘴里就这么放出来了，真是臭不可闻。&lt;img data-rawheight="1334" src="https://pic2.zhimg.com/50/v2-c1bd8204fcc2d829a33408b05d2a6176_hd.jpg" data-rawwidth="750" class="origin_image zh-lightbox-thumb" width="750" data-original="https://pic2.zhimg.com/v2-c1bd8204fcc2d829a33408b05d2a6176_r.jpg"&gt;别自作聪明了以为是图书馆预约系统发现不了你，看看下面微信聊天记录那张图，殊不知是给你留着脸留着机会，心里还真是没点B数，自己只是一瓶子不满半瓶子晃荡的醋罢了。练手需要通过这种损人不利己的方式？靠这种机会练手我怕你的绩点上不了2吧？毕不了业也好，省得给武汉大学丢人现眼。我从未见过如此厚颜无耻之人，颠倒是非混淆黑白的功夫真是厉害，煽动性的歪理邪说一套一套。无耻之人，苟活于世罢了。再来看看精彩的评论区&lt;img data-rawheight="1334" src="https://pic3.zhimg.com/50/v2-cb134ddbd0f2b17b9426673e32dbd882_hd.jpg" data-rawwidth="750" class="origin_image zh-lightbox-thumb" width="750" data-original="https://pic3.zhimg.com/v2-cb134ddbd0f2b17b9426673e32dbd882_r.jpg"&gt;有想拜师的，真心建议你还是走正道吧，人在做天在看，多行不义必自毙，哦，开挂的话家人生命安全也有问题。有说没大问题没规定的，那我就给您贴出规定来。&lt;img data-rawheight="1334" src="https://pic1.zhimg.com/50/v2-cfb19bea24aca2186a7689b2434210e6_hd.jpg" data-rawwidth="750" class="origin_image zh-lightbox-thumb" width="750" data-original="https://pic1.zhimg.com/v2-cfb19bea24aca2186a7689b2434210e6_r.jpg"&gt; 微信公众号说没说是违规行为？您认识汉字嘛？学校采用座位预约制度的初衷就是希望大家合理利用资源，公平竞争，可是由于专业原因有些专业有这个特长就能拿来破坏竞争的公平性？学校会默许这是合理的行为？您这个智商怕真的侮辱武汉大学的名声吧。假设如果有人碰到用挂的现象觉得气不过就是不让座给用挂的人，然后这样会不会造成民愤的泛滥和预约制度公信力的丢失？平心而论，我觉得有些人不应该在这所学校里，他们品德决定了不配拥有知识。忍无可忍之后，我把情况全部如实反应给了图书馆和软件公司，现在初步的技术方案和惩罚措施都已经出来了，只要用七天封号加公布名单，通报院系。&lt;img data-rawheight="1334" src="https://pic4.zhimg.com/50/v2-244b4788674ab4d8b5a303283e40da6e_hd.jpg" data-rawwidth="750" class="origin_image zh-lightbox-thumb" width="750" data-original="https://pic4.zhimg.com/v2-244b4788674ab4d8b5a303283e40da6e_r.jpg"&gt;那些打着想学习旗号哗众取宠写外挂用外挂的人，您这一封号1/3个期末就废了，不妨掂量掂量。哦，我忘了，您心里连点B数都没有，连自己的行为性质都不清楚，怕是掂量不出轻重来吧。我是真的生气，某些人用外挂用的理直气壮，还拿什么12306，刷票app来比较，恕我直言您这三观以后蹲局子的时候可别说是武汉大学的校友。国家法律写没写让不让刷票我不太清楚，但是武汉大学图书馆规章制度明确规定不可以有此类行为。奉劝各位最近风头正紧，用外挂请考虑自己的学籍安全和家人生命安全。别忘了，当年汉姆运动刚出来的时候，某软件学院高材生投机取巧直接让警察带走了呢。我知道，某些人用违规行为严重损害别人的合理利益，采用不正当竞争手段无所不用其极的做法，是丑恶的，是见不得人的。公理正义自在人心，希望看到的同学们如果不想自己的公平权益被外挂损害，给一个赞吧，我想让更多正义之士看到这个回答，引起大家的重视，让某些不法分子成为过街老鼠，谢谢啦。
