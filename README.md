@@ -22,6 +22,12 @@
 
 * 暂无
 
+## 使用方法
+
+1. 配置 [Python3](https://www.python.org/) 运行环境 (已经配置好环境的可忽略此步骤)
+2. Terminal 或 CMD 执行 `pip3 install requests` 安装 requests 库
+3. 运行 `main.py` ，按提示输入相关参数，即可实现自动抢座
+
 ## 软件截图
 
 <p align="center">
