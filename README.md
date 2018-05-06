@@ -1,6 +1,6 @@
 # SeatKiller
 
-[![License](https://img.shields.io/badge/license-MIT-red.svg?colorB=D5283A#)](LICENSE)
+[![License](https://img.shields.io/badge/License-MPL--2.0-red.svg)](LICENSE)
 [![Language](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
 ![GitHub last commit](https://img.shields.io/github/last-commit/goolhanrry/SeatKiller.svg)
 [![GitHub repo size in bytes](https://img.shields.io/github/repo-size/goolhanrry/SeatKiller.svg?colorB=ff7e00#)](https://github.com/goolhanrry/SeatKiller)
@@ -21,6 +21,12 @@
 ## 即将实现的功能
 
 * 暂无
+
+## 使用方法
+
+1. 配置 [Python3](https://www.python.org/) 运行环境 (已经配置好环境的可忽略此步骤)
+2. Terminal 或 CMD 执行 `pip3 install requests` 安装 requests 库
+3. 运行 `main.py` ，按提示输入相关参数，即可实现自动抢座
 
 ## 软件截图
 
