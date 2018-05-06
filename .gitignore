@@ -101,3 +101,5 @@ ENV/
 *.xml
 
 .idea/
+._main.py
+._SeatKiller.py
