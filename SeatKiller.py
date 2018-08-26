@@ -18,22 +18,30 @@ class SeatKiller(object):
         self.login_url = 'https://seat.lib.whu.edu.cn:8443/rest/auth'  # 图书馆移动端登陆API
         self.usr_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/user'  # 用户信息API
         self.filters_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/free/filters'  # 分馆和区域信息API
-        self.stats_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/stats2/'  # 单一分馆区域信息API（拼接buildingId）
-        self.layout_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/layoutByDate/'  # 单一区域座位信息API（拼接roomId+date）
-        self.search_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/searchSeats/'  # 空位检索API（拼接date+startTime+endTime）
-        self.startTime_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/startTimesForSeat/'  # 座位开始时间API（拼接roomId+date）
-        self.endTime_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/endTimesForSeat/'  # 座位结束时间API（拼接roomId+date+startTime）
-        self.history_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/history/1/'  # 预约历史记录API（拼接历史记录个数）
+        # 单一分馆区域信息API（拼接buildingId）
+        self.stats_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/stats2/'
+        # 单一区域座位信息API（拼接roomId+date）
+        self.layout_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/room/layoutByDate/'
+        # 空位检索API（拼接date+startTime+endTime）
+        self.search_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/searchSeats/'
+        # 座位开始时间API（拼接roomId+date）
+        self.startTime_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/startTimesForSeat/'
+        # 座位结束时间API（拼接roomId+date+startTime）
+        self.endTime_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/endTimesForSeat/'
+        # 预约历史记录API（拼接历史记录个数）
+        self.history_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/history/1/'
         self.book_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/freeBook'  # 座位预约API
         self.cancel_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/cancel/'  # 取消预约API（拼接预约ID）
         self.stop_url = 'https://seat.lib.whu.edu.cn:8443/rest/v2/stop'  # 座位释放API
 
         # 已预先爬取的roomId
-        self.xt = ('6', '7', '8', '9', '10', '11', '12', '16', '4', '5', '14', '15')
+        self.xt = ('6', '7', '8', '9', '10', '11',
+                   '12', '16', '4', '5', '14', '15')
         self.xt_less = ('6', '7', '8', '9', '10', '11', '12', '16')
         self.gt = ('19', '29', '31', '32', '33', '34', '35', '37', '38')
         self.yt = ('20', '21', '23', '24', '26', '27')
-        self.zt = ('39', '40', '51', '52', '56', '59', '60', '61', '62', '65', '66')
+        self.zt = ('39', '40', '51', '52', '56',
+                   '59', '60', '61', '62', '65', '66')
 
         self.allSeats = {}  # 用于储存某区域的所有座位信息
         self.freeSeats = []  # 用于储存空闲seatId的数组
@@ -59,14 +67,16 @@ class SeatKiller(object):
             time_run = datetime.datetime.replace(datetime.datetime.now() + datetime.timedelta(days=1), hour=hour,
                                                  minute=minute, second=second)
         else:
-            time_run = datetime.datetime.replace(datetime.datetime.now(), hour=hour, minute=minute, second=second)
+            time_run = datetime.datetime.replace(
+                datetime.datetime.now(), hour=hour, minute=minute, second=second)
         print('\n', end='')
         while True:
             delta = time_run - datetime.datetime.now()
             if delta.total_seconds() <= 0:
                 print('\n', end='')
                 break
-            print('\r正在等待系统开放...剩余' + str(int(delta.total_seconds())) + '秒', end='    ')
+            print('\r正在等待系统开放...剩余' +
+                  str(int(delta.total_seconds())) + '秒', end='    ')
             time.sleep(0.05)
 
     # 发起GET请求，用旧token换取新token（旧token通过移动端抓包获得，可以保存后多次使用）并构建Headers，成功则返回token字符串，否则返回False
@@ -74,7 +84,8 @@ class SeatKiller(object):
         datas = {'username': self.username, 'password': self.password}
         print('\nTry getting token...Status: ', end='')
         try:
-            response = requests.get(self.login_url, params=datas, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                self.login_url, params=datas, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             print(json['status'])
             if json['status'] == 'success':
@@ -92,7 +103,8 @@ class SeatKiller(object):
     # 发起GET请求，获取用户信息并打印出来，成功则返回True，否则返回False
     def GetUsrInf(self):
         try:
-            response = requests.get(self.usr_url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                self.usr_url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             if json['status'] == 'success':
                 self.name = json['data']['name']
@@ -112,7 +124,8 @@ class SeatKiller(object):
     def GetBuildings(self):
         print('\nTry getting building information...Status: ', end='')
         try:
-            response = requests.get(self.filters_url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                self.filters_url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             print(json['status'])
             if json['status'] == 'success':
@@ -129,7 +142,8 @@ class SeatKiller(object):
         url = self.stats_url + buildingId
         print('\nTry getting room information...Status: ', end='')
         try:
-            response = requests.get(url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             print(json['status'])
             if json['status'] == 'success':
@@ -152,7 +166,8 @@ class SeatKiller(object):
         url = self.history_url + '30'
         print('\nTry getting reservation information...Status: ', end='')
         try:
-            response = requests.get(url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             print(json['status'])
             if json['status'] == 'success':
@@ -160,21 +175,25 @@ class SeatKiller(object):
                     if reservation['stat'] in ['RESERVE', 'CHECK_IN', 'AWAY']:
                         print('\n--------------------已检测到有效预约---------------------')
                         print('ID：' + str(reservation['id']))
-                        print('时间：' + reservation['date'] + ' ' + reservation['begin'] + '～' + reservation['end'])
+                        print(
+                            '时间：' + reservation['date'] + ' ' + reservation['begin'] + '～' + reservation['end'])
                         if reservation['awayBegin'] and reservation['awayEnd']:
-                            print('暂离时间：' + reservation['awayBegin'] + '～' + reservation['awayEnd'])
+                            print(
+                                '暂离时间：' + reservation['awayBegin'] + '～' + reservation['awayEnd'])
                         elif reservation['awayBegin'] and not reservation['awayEnd']:
                             print('暂离时间：' + reservation['awayBegin'])
                         print('状态：' + self.state.get(reservation['stat']))
                         print('地址：' + reservation['loc'])
-                        print('------------------------------------------------------')
+                        print(
+                            '------------------------------------------------------')
 
                         if '3C创客空间' in reservation['loc'] and reservation['stat'] == 'RESERVE':
                             if input('\n该座位位于\'一楼3C创客空间\'，是否进入改签模式（1.是 2.否）：') == '1':
                                 self.ExchangeLoop('1', self.xt_less,
                                                   str(int(reservation['begin'][:2]) * 60 + int(
                                                       reservation['begin'][-2:])),
-                                                  str(int(reservation['end'][:2]) * 60 + int(reservation['end'][-2:])),
+                                                  str(int(
+                                                      reservation['end'][:2]) * 60 + int(reservation['end'][-2:])),
                                                   str(reservation['id']))
                                 sys.exit()
 
@@ -193,14 +212,16 @@ class SeatKiller(object):
         url = self.layout_url + roomId + '/' + date
         print('\nTry getting seat information...Status: ', end='')
         try:
-            response = requests.get(url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             print(json['status'])
             if json['status'] == 'success':
                 self.allSeats = {}
                 for seat in json['data']['layout']:
                     if json['data']['layout'][seat]['type'] == 'seat':
-                        self.allSeats[json['data']['layout'][seat]['name']] = str(json['data']['layout'][seat]['id'])
+                        self.allSeats[json['data']['layout'][seat]['name']] = str(
+                            json['data']['layout'][seat]['id'])
                 return True
             else:
                 print(json)
@@ -212,15 +233,19 @@ class SeatKiller(object):
     # 发起GET请求，检索某区域内指定时间段的空位，成功则返回'Success'并将seatId存入freeSeats数组中，否则返回'Failed'，连接丢失则返回'Connection lost'
     def SearchFreeSeat(self, buildingId, roomId, date, startTime, endTime, batch='9999', page='1'):
         url = self.search_url + date + '/' + startTime + '/' + endTime
-        datas = {'t': '1', 'roomId': roomId, 'buildingId': buildingId, 'batch': batch, 'page': page, 't2': '2'}
-        print('\nTry searching for free seats in room ' + roomId + '...Status: ', end='')
+        datas = {'t': '1', 'roomId': roomId, 'buildingId': buildingId,
+                 'batch': batch, 'page': page, 't2': '2'}
+        print('\nTry searching for free seats in room ' +
+              roomId + '...Status: ', end='')
         try:
-            response = requests.post(url, headers=self.headers, data=datas, verify=False, timeout=5)
+            response = requests.post(
+                url, headers=self.headers, data=datas, verify=False, timeout=5)
             json = response.json()
             if json['data']['seats'] != {}:
                 print('success')
                 for num in json['data']['seats']:
-                    self.freeSeats.append(str(json['data']['seats'][num]['id']))
+                    self.freeSeats.append(
+                        str(json['data']['seats'][num]['id']))
                 return 'Success'
             else:
                 print('failed')
@@ -232,9 +257,11 @@ class SeatKiller(object):
     # 发起GET请求，检查某座位的可用时间是否包括开始时间，若包括则返回True，否则返回False
     def CheckStartTime(self, seatId, date, startTime):
         url = self.startTime_url + seatId + '/' + date
-        print('\nTry checking startTimes of seat No.' + seatId + '...Status: ', end='')
+        print('\nTry checking startTimes of seat No.' +
+              seatId + '...Status: ', end='')
         try:
-            response = requests.get(url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             if json['status'] == 'success':
                 self.startTimes.clear()
@@ -256,9 +283,11 @@ class SeatKiller(object):
     # 发起GET请求，检查某座位的可用时间是否包括结束时间，若包括则返回True，否则返回False
     def CheckEndTime(self, seatId, date, startTime, endTime):
         url = self.endTime_url + seatId + '/' + date + '/' + startTime
-        print('\nTry checking endTimes of seat No.' + seatId + '...Status: ', end='')
+        print('\nTry checking endTimes of seat No.' +
+              seatId + '...Status: ', end='')
         try:
-            response = requests.get(url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             if json['status'] == 'success':
                 self.endTimes.clear()
@@ -279,17 +308,20 @@ class SeatKiller(object):
 
     # 发起POST请求，尝试预定指定座位，成功则打印预定信息并返回'Success'，失败则返回'Failed'，连接丢失则返回'Connection lost'
     def BookSeat(self, seatId, date, startTime, endTime):
-        datas = {'t': '1', 'startTime': startTime, 'endTime': endTime, 'seat': seatId, 'date': date, 't2': '2'}
+        datas = {'t': '1', 'startTime': startTime, 'endTime': endTime,
+                 'seat': seatId, 'date': date, 't2': '2'}
         print('\nTry booking seat...Status: ', end='')
         try:
-            response = requests.post(self.book_url, headers=self.headers, data=datas, verify=False, timeout=5)
+            response = requests.post(
+                self.book_url, headers=self.headers, data=datas, verify=False, timeout=5)
             json = response.json()
             print(json['status'])
             if json['status'] == 'success':
                 self.PrintBookInf(json)
                 if self.to_addr:
                     if self.SendMail(json):
-                        print('\n邮件提醒发送成功，若接收不到提醒，请将\'seatkiller@outlook.com\'添加至邮箱白名单')
+                        print(
+                            '\n邮件提醒发送成功，若接收不到提醒，请将\'seatkiller@outlook.com\'添加至邮箱白名单')
                     else:
                         print('\n邮件提醒发送失败')
                 if '3C创客空间' in json['data']['location']:
@@ -308,7 +340,8 @@ class SeatKiller(object):
         url = self.cancel_url + id
         print('\nTry cancelling reservation...Status: ', end='')
         try:
-            response = requests.get(url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             print(json['status'])
             if json['status'] == 'success':
@@ -324,7 +357,8 @@ class SeatKiller(object):
     def StopUsing(self):
         print('\nTry releasing seat...Status: ', end='')
         try:
-            response = requests.get(self.stop_url, headers=self.headers, verify=False, timeout=5)
+            response = requests.get(
+                self.stop_url, headers=self.headers, verify=False, timeout=5)
             json = response.json()
             print(json['status'])
             if json['status'] == 'success':
@@ -341,7 +375,8 @@ class SeatKiller(object):
         print('\n--------------------座位预约成功!--------------------')
         print('ID：' + str(json['data']['id']))
         print('凭证号码：' + json['data']['receipt'])
-        print('时间：' + json['data']['onDate'] + ' ' + json['data']['begin'] + '～' + json['data']['end'])
+        print('时间：' + json['data']['onDate'] + ' ' +
+              json['data']['begin'] + '～' + json['data']['end'])
         print('状态：' + ('已签到' if json['data']['checkedIn'] else '预约'))
         print('地址：' + json['data']['location'])
         print('---------------------------------------------------')
@@ -351,7 +386,8 @@ class SeatKiller(object):
         jsonCode['username'] = self.username
         jsonCode['name'] = self.name
         jsonCode['client'] = 'python'
-        jsonCode['time'] = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        jsonCode['time'] = datetime.datetime.now().strftime(
+            '%Y-%m-%d %H:%M:%S')
         print('\n尝试连接邮件发送服务器...')
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -361,7 +397,8 @@ class SeatKiller(object):
             if s.recv(1024).decode('utf-8') == 'Hello':
                 print('连接成功')
 
-            s.send(bytes('json' + str(json.dumps(jsonCode, ensure_ascii=False, indent=2)), 'utf-8'))
+            s.send(bytes('json' + str(json.dumps(jsonCode,
+                                                 ensure_ascii=False, indent=2)), 'utf-8'))
             print(s.recv(1024).decode('utf-8'))
 
             s.send(bytes(self.to_addr, 'utf-8'))
@@ -393,10 +430,12 @@ class SeatKiller(object):
                         print('\n连接丢失，30秒后尝试继续检索空位')
                         time.sleep(30)
                 for freeSeatId in self.freeSeats:
-                    response = self.BookSeat(freeSeatId, date, startTime, endTime)
+                    response = self.BookSeat(
+                        freeSeatId, date, startTime, endTime)
                     if response[0] in map(str, range(10)) or response == 'Success':
                         print('\n捡漏成功')
-                        print('\n-------------------------捡漏模式结束--------------------------')
+                        print(
+                            '\n-------------------------捡漏模式结束--------------------------')
                         return response
                     elif response == 'Failed':
                         time.sleep(random.uniform(1, 3))
@@ -406,9 +445,11 @@ class SeatKiller(object):
                         time.sleep(60)
                         continue
                 else:
-                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=20, minute=0, second=0)
+                    ddl = datetime.datetime.replace(
+                        datetime.datetime.now(), hour=20, minute=0, second=0)
                     delta = ddl - datetime.datetime.now()
-                    print('\n循环结束，3秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
+                    print('\n循环结束，3秒后进入下一个循环，运行时间剩余' +
+                          str(delta.seconds) + '秒\n')
                     time.sleep(3)
             else:
                 print('\n获取token失败，1分钟后再次尝试')
@@ -433,7 +474,8 @@ class SeatKiller(object):
             self.freeSeats = []
             if self.GetToken():
                 for i in rooms:
-                    res = self.SearchFreeSeat(buildingId, i, date, startTime, endTime)
+                    res = self.SearchFreeSeat(
+                        buildingId, i, date, startTime, endTime)
                     if res == 'Connection lost':
                         print('\n连接丢失，30秒后尝试继续检索空位')
                         time.sleep(30)
@@ -444,10 +486,12 @@ class SeatKiller(object):
                         continue
                     if self.CancelReservation(id):
                         cancelled = True
-                    response = self.BookSeat(freeSeatId, date, startTime, endTime)
+                    response = self.BookSeat(
+                        freeSeatId, date, startTime, endTime)
                     if response == 'Success':
                         print('\n改签成功')
-                        print('\n-------------------------改签模式结束--------------------------')
+                        print(
+                            '\n-------------------------改签模式结束--------------------------')
                         return True
                     elif response == 'Failed':
                         time.sleep(random.uniform(1, 3))
@@ -457,9 +501,11 @@ class SeatKiller(object):
                         time.sleep(60)
                         continue
                 else:
-                    ddl = datetime.datetime.replace(datetime.datetime.now(), hour=20, minute=0, second=0)
+                    ddl = datetime.datetime.replace(
+                        datetime.datetime.now(), hour=20, minute=0, second=0)
                     delta = ddl - datetime.datetime.now()
-                    print('\n循环结束，3秒后进入下一个循环，运行时间剩余' + str(delta.seconds) + '秒\n')
+                    print('\n循环结束，3秒后进入下一个循环，运行时间剩余' +
+                          str(delta.seconds) + '秒\n')
                     time.sleep(3)
             else:
                 print('\n获取token失败，1分钟后再次尝试')
