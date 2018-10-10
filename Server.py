@@ -57,7 +57,11 @@ def tcplink(sock, addr, passwd):
             if not data or str(data.decode('utf-8')) == 'exit':
                 break
 
-            if str(data.decode('utf-8')) == 'SendMail':
+            if data.decode('utf-8')[0:5] == 'login':
+                username = data.decode('utf-8')[5:18]
+                name = data.decode('utf-8')[18:]
+                print('\n' + time.asctime(time.localtime(time.time())) + ': ' + username + ' ' + name + 'logged in')
+            elif str(data.decode('utf-8')) == 'SendMail':
                 if SendMail(json, to_addr, passwd):
                     sock.send('success'.encode('utf-8'))
                     print('\nMail Sent Successfully')
@@ -71,7 +75,7 @@ def tcplink(sock, addr, passwd):
                 sock.send('Get json file...'.encode('utf-8'))
             else:
                 to_addr = data.decode('utf-8')
-                print('\nTo: ' + data.decode('utf-8') + '\n')
+                print('\nTo: ' + to_addr + '\n')
                 sock.send('Get email address...'.encode('utf-8'))
 
         sock.close()
