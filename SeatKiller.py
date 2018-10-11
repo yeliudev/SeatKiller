@@ -401,7 +401,7 @@ class SeatKiller(object):
                                                  ensure_ascii=False, indent=2)), 'utf-8'))
             print(s.recv(1024).decode('utf-8'))
 
-            s.send(bytes(self.to_addr, 'utf-8'))
+            s.send(bytes('to' + self.to_addr, 'utf-8'))
             print(s.recv(1024).decode('utf-8'))
 
             print('正在尝试发送邮件提醒至\'' + self.to_addr + '\'...')

@@ -73,10 +73,13 @@ def tcplink(sock, addr, passwd):
                 print('\ndecodedData: ' + decodedData)
                 json = eval(decodedData)
                 sock.send('Get json file...'.encode('utf-8'))
-            else:
-                to_addr = data.decode('utf-8')
+            elif data.decode('utf-8')[0:2] == 'to':
+                to_addr = data.decode('utf-8')[2:]
                 print('\nTo: ' + to_addr + '\n')
                 sock.send('Get email address...'.encode('utf-8'))
+            else:
+                print('\nFormat error: ' + data.decode('utf-8'))
+                break
 
         sock.close()
         print('Connection from %s:%s closed.' % addr)
