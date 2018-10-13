@@ -169,9 +169,9 @@ else:
 
 while True:
     try_booking = True
-    if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=14, second=40):
+    if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=44, second=40):
         print('\n------------------------准备获取token------------------------')
-        SK.Wait(22, 14, 40)
+        SK.Wait(22, 44, 40)
     else:
         print('\n------------------------开始获取token------------------------')
     date = datetime.date.today() + datetime.timedelta(days=1)
@@ -184,8 +184,8 @@ while True:
         if roomId != '0':
             SK.GetSeats(roomId, date)
 
-        if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=15, second=0):
-            SK.Wait(22, 15, 0)
+        if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=45, second=0):
+            SK.Wait(22, 45, 0)
         elif datetime.datetime.now() > datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45,
                                                                  second=0):
             print('\n预约系统开放时间已过，准备进入捡漏模式')
