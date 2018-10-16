@@ -26,7 +26,7 @@ def SendMail(json, to_addr, passwd):
         else:
             text = text + '\n状态：预约'
         text = text + '\n地址：' + json['data'][
-            'location'] + '\n-----------------------------------------------------\n\nDesighed by goolhanrry from WHU'
+            'location'] + '\n-----------------------------------------------------\n\nBrought to you by goolhanrry😉'
 
         msg = MIMEText(text, 'plain', 'utf-8')
         msg['From'] = 'SeatKiller' + ' <' + from_addr + '>'
