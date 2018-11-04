@@ -10,6 +10,12 @@ import re
 import sys
 import random
 
+
+def test_main():
+    SK = SeatKiller.SeatKiller()
+    assert not SK.GetToken()
+
+
 warnings.filterwarnings('ignore')
 enableLoop = True
 exchange = False
@@ -225,12 +231,14 @@ while True:
                     continue
 
                 for freeSeatId in SK.freeSeats:
-                    response = SK.BookSeat(freeSeatId, date, startTime, endTime)
+                    response = SK.BookSeat(
+                        freeSeatId, date, startTime, endTime)
                     if response == 'Success':
                         try_booking = False
                         break
                     elif response[0] in map(str, range(10)) and exchange:
-                        SK.ExchangeLoop('1', SK.xt_less, startTime, endTime, response, nextDay=True)
+                        SK.ExchangeLoop('1', SK.xt_less, startTime,
+                                        endTime, response, nextDay=True)
                         try_booking = False
                         break
                     elif response[0] in map(str, range(10)) and not exchange:
@@ -239,16 +247,19 @@ while True:
                     elif response == 'Failed':
                         time.sleep(random.uniform(1, 3))
                     else:
-                        ddl = datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45, second=0)
+                        ddl = datetime.datetime.replace(
+                            datetime.datetime.now(), hour=23, minute=45, second=0)
                         delta = ddl - datetime.datetime.now()
-                        print('\n连接丢失，1分钟后重新尝试抢座，系统开放时间剩余' + str(delta.seconds) + '秒\n')
+                        print('\n连接丢失，1分钟后重新尝试抢座，系统开放时间剩余' +
+                              str(delta.seconds) + '秒\n')
                         time.sleep(60)
             else:
                 print('\n抢座失败，座位预约系统已关闭，开始尝试捡漏')
                 SK.Wait(0, 59, 59, nextDay=True)
                 response = SK.Loop(buildingId, rooms, startTime, endTime)
                 if response[0] in map(str, range(10)) and exchange:
-                    SK.ExchangeLoop('1', SK.xt_less, startTime, endTime, response)
+                    SK.ExchangeLoop('1', SK.xt_less, startTime,
+                                    endTime, response)
         print('\n抢座运行结束，2小时后进入下一轮循环')
         time.sleep(7200)
     else:
