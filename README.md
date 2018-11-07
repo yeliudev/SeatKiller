@@ -1,9 +1,8 @@
 # SeatKiller
 
-[![Travis](https://img.shields.io/travis/goolhanrry/SeatKiller.svg)](https://www.travis-ci.org/goolhanrry/SeatKiller)
-[![License](https://img.shields.io/badge/License-MPL--2.0-red.svg)](LICENSE)
+[![Build Status](https://img.shields.io/travis/goolhanrry/SeatKiller.svg?branch=master)](https://www.travis-ci.org/goolhanrry/SeatKiller)
+[![License](https://img.shields.io/badge/license-MPL--2.0-red.svg)](LICENSE)
 [![Language](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
-![GitHub last commit](https://img.shields.io/github/last-commit/goolhanrry/SeatKiller.svg)
 [![GitHub repo size in bytes](https://img.shields.io/github/repo-size/goolhanrry/SeatKiller.svg?colorB=ff7e00#)](https://github.com/goolhanrry/SeatKiller)
 
 偶然发现图书馆的服务器没设防，于是写了这个小工具练练手，随缘更新，欢迎添加我的微信：`aweawds` 交流讨论
