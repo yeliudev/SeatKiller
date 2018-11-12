@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import pymysql
 import socket
 import smtplib
 import threading
+import datetime
 import time
 from email.header import Header
 from email.mime.text import MIMEText
+
+
+sql_insert = "insert into user(username,nickname,lastLoginTime) values('%s','%s','%s');"
+sql_select = "select 1 from user where username = '%s' limit 1;"
+sql_update = "update user set lastLoginTime = '%s' where username = '%s';"
 
 
 # 发起get请求，尝试发送邮件提醒
@@ -59,9 +66,24 @@ def tcplink(sock, addr, passwd):
 
             if data.decode('utf-8')[0:5] == 'login':
                 username = data.decode('utf-8')[5:18]
-                name = data.decode('utf-8')[18:]
-                print('\n' + time.asctime(time.localtime(time.time())) +
-                      ': ' + username + ' ' + name + ' logged in')
+                info = data.decode('utf-8')[18:]
+                nickname = info.split()[0]
+
+                timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+                try:
+                    cur.execute(sql_select % (username))
+                    res = cur.fetchall()
+                    if len(res):
+                        cur.execute(sql_update % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), username))
+                        db.commit()
+                    else:
+                        cur.execute(sql_insert % (username, nickname, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                        db.commit()
+                except:
+                    db.rollback()
+
+                print('\n' + timeStr + ': ' + username + ' ' + info + ' logged in')
             elif str(data.decode('utf-8')) == 'SendMail':
                 if SendMail(json, to_addr, passwd):
                     sock.send('success'.encode('utf-8'))
@@ -70,8 +92,7 @@ def tcplink(sock, addr, passwd):
                     sock.send('fail'.encode('utf-8'))
                     print('\nFailed')
             elif data.decode('utf-8')[0:4] == 'json':
-                decodedData = data.decode(
-                    'utf-8')[4:].replace(': ', ':').replace(':', ': ').replace('false', 'False')
+                decodedData = data.decode('utf-8')[4:].replace(': ', ':').replace(':', ': ').replace('false', 'False')
                 print('\ndecodedData: ' + decodedData)
                 json = eval(decodedData)
                 sock.send('Get json file...'.encode('utf-8'))
@@ -91,6 +112,11 @@ def tcplink(sock, addr, passwd):
 
 
 passwd = input('Passwd:')
+dbPasswd = input('MySQL passwd:')
+
+db = pymysql.connect("134.175.186.17", "root", dbPasswd, "user")
+cur = db.cursor()
+
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.bind(('0.0.0.0', 5210))
 s.listen(10)
