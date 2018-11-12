@@ -68,7 +68,7 @@ def tcplink(sock, addr, passwd):
                 username = data.decode('utf-8')[5:18]
                 info = data.decode('utf-8')[18:]
                 nickname = info.split()[0]
-                version = info[-5:-2]
+                version = info[-6:-1]
 
                 timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
