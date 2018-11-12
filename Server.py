@@ -11,9 +11,9 @@ from email.header import Header
 from email.mime.text import MIMEText
 
 
-sql_insert = "insert into user(username,nickname,lastLoginTime) values('%s','%s','%s');"
-sql_select = "select 1 from user where username = '%s' limit 1;"
-sql_update = "update user set lastLoginTime = '%s' where username = '%s';"
+sql_insert = "insert into user(username,nickname,version,lastLoginTime) values('%s','%s','%s','%s');"
+sql_select = "select 1 from user where username='%s' limit 1;"
+sql_update = "update user set version='%s',lastLoginTime='%s' where username='%s';"
 
 
 # 发起get请求，尝试发送邮件提醒
@@ -68,6 +68,7 @@ def tcplink(sock, addr, passwd):
                 username = data.decode('utf-8')[5:18]
                 info = data.decode('utf-8')[18:]
                 nickname = info.split()[0]
+                version = info[-5:-2]
 
                 timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
@@ -75,10 +76,10 @@ def tcplink(sock, addr, passwd):
                     cur.execute(sql_select % (username))
                     res = cur.fetchall()
                     if len(res):
-                        cur.execute(sql_update % (datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), username))
+                        cur.execute(sql_update % (version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), username))
                         db.commit()
                     else:
-                        cur.execute(sql_insert % (username, nickname, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                        cur.execute(sql_insert % (username, nickname, version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                         db.commit()
                 except:
                     db.rollback()
