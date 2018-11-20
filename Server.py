@@ -51,49 +51,43 @@ def tcplink(sock, addr, passwd):
         # print('\nAccept new connection from %s:%s...' % addr)
         sock.send('hello'.encode())
 
-        while True:
-            data = sock.recv(512).decode()
-            info = data.split()
-            time.sleep(1)
+        data = sock.recv(512).decode()
+        info = data.split()
+        time.sleep(1)
 
-            if info[0] == 'login':
-                username = info[1]
-                nickname = info[2]
-                version = info[3]
+        if info[0] == 'login':
+            username = info[1]
+            nickname = info[2]
+            version = info[3]
 
-                timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print('\n%s: %s %s (%s) logged in' % (timeStr, username, nickname, version))
+            timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print('\n%s: %s %s (%s) logged in' % (timeStr, username, nickname, version))
 
-                try:
-                    cur.execute(sql_select % (username))
-                    res = cur.fetchall()
-                    if len(res):
-                        cur.execute(sql_update % (version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), username))
-                        db.commit()
-                    else:
-                        cur.execute(sql_insert % (username, nickname, version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-                        db.commit()
-                except:
-                    print('Database update error')
-                    db.rollback()
-
-                break
-            elif info[0] == 'json':
-                json = eval(data[5:])
-                print('\n' + json)
-                print('\nSending mail to %s...' % json['to_addr'], end='')
-
-                if sendMail(json['data'], json['to_addr'], passwd):
-                    sock.send('success'.encode())
-                    print('success')
+            try:
+                cur.execute(sql_select % (username))
+                res = cur.fetchall()
+                if len(res):
+                    cur.execute(sql_update % (version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), username))
+                    db.commit()
                 else:
-                    sock.send('fail'.encode())
-                    print('failed')
+                    cur.execute(sql_insert % (username, nickname, version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
+                    db.commit()
+            except:
+                print('Database update error')
+                db.rollback()
+        elif info[0] == 'json':
+            json = eval(data[5:])
+            print('\n' + json)
+            print('\nSending mail to %s...' % json['to_addr'], end='')
 
-                break
+            if sendMail(json['data'], json['to_addr'], passwd):
+                sock.send('success'.encode())
+                print('success')
             else:
-                print('\nFormat error: ' + data)
-                break
+                sock.send('fail'.encode())
+                print('failed')
+        else:
+            print('\nFormat error: ' + data)
 
         sock.close()
         # print('Connection from %s:%s closed.' % addr)
