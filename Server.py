@@ -76,16 +76,21 @@ def tcplink(sock, addr, passwd):
                 except:
                     print('Database update error')
                     db.rollback()
+
+                break
             elif info[0] == 'json':
                 json = eval(data[5:])
                 print('\n' + json)
                 print('\nSending mail to %s...' % json['to_addr'], end='')
+
                 if sendMail(json['data'], json['to_addr'], passwd):
                     sock.send('success'.encode())
                     print('success')
                 else:
                     sock.send('fail'.encode())
                     print('failed')
+
+                break
             else:
                 print('\nFormat error: ' + data)
                 break
