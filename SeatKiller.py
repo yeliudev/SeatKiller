@@ -42,7 +42,8 @@ class SeatKiller(object):
         self.username = username
         self.password = password
         self.to_addr = ''
-        self.headers = {'User-Agent': 'doSingle/11 CFNetwork/893.14.2 Darwin/17.3.0',
+        self.headers = {'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'User-Agent': 'doSingle/11 CFNetwork/893.14.2 Darwin/17.3.0',
                         'token': self.token}
         self.state = {'RESERVE': '预约', 'CHECK_IN': '履约中', 'AWAY': '暂离'}
 
