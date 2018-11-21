@@ -77,7 +77,7 @@ def tcplink(sock, addr, passwd):
                 db.rollback()
         elif info[0] == 'json':
             json = eval(data[5:])
-            print('\n' + json)
+            print('\n' + data[5:])
             print('\nSending mail to %s...' % json['to_addr'], end='')
 
             if sendMail(json['data'], json['to_addr'], passwd):
