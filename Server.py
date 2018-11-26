@@ -24,7 +24,7 @@ class SocketHandler(BaseRequestHandler):
         sock, addr = self.client_address
 
         try:
-            # print('\nAccept new connection from %s:%s...' % addr)
+            # print('\nAccept new connection from %s...' % addr)
             self.request.sendall('hello'.encode())
 
             data = self.request.recv(512).decode()
@@ -56,7 +56,7 @@ class SocketHandler(BaseRequestHandler):
                 print('\n%s' % data[5:])
                 print('\nSending mail to %s...' % json['to_addr'], end='')
 
-                if sendMail(json['data'], json['to_addr']):
+                if self.sendMail(json['data'], json['to_addr']):
                     self.request.sendall('success'.encode())
                     print('success')
                 else:
@@ -65,9 +65,9 @@ class SocketHandler(BaseRequestHandler):
             else:
                 print('\nFormat error: %s' % data)
 
-            # print('Connection from %s:%s closed.' % addr)
+            # print('Connection from %s closed.' % addr)
         except:
-            print('\nConnection from %s:%s lost.' % addr)
+            print('\nConnection from %s lost.' % addr)
 
     def sendMail(self, data, to_addr):
         try:
