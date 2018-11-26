@@ -22,52 +22,49 @@ sql_update = "update user set version='%s',lastLoginTime='%s' where username='%s
 class SocketHandler(BaseRequestHandler):
     def handle(self):
         sock, addr = self.client_address
+        # print('\nAccept new connection from %s...' % addr)
 
-        try:
-            # print('\nAccept new connection from %s...' % addr)
-            self.request.sendall('hello'.encode())
+        self.request.sendall('hello'.encode())
 
-            data = self.request.recv(512).decode()
-            info = data.split()
-            time.sleep(1)
+        data = self.request.recv(512).decode()
+        info = data.split()
+        time.sleep(1)
 
-            if info[0] == 'login':
-                username = info[1]
-                nickname = info[2]
-                version = info[3]
+        if info[0] == 'login':
+            username = info[1]
+            nickname = info[2]
+            version = info[3]
 
-                timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print('\n%s: %s %s (%s) logged in' % (timeStr, username, nickname, version))
+            timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            print('\n%s: %s %s (%s) logged in' % (timeStr, username, nickname, version))
 
-                try:
-                    cur.execute(sql_select % username)
-                    res = cur.fetchall()
-                    if len(res):
-                        cur.execute(sql_update % (version, timeStr, username))
-                        db.commit()
-                    else:
-                        cur.execute(sql_insert % (username, nickname, version, timeStr))
-                        db.commit()
-                except Exception as e:
-                    print('Database update error: %s' % e.message)
-                    db.rollback()
-            elif info[0] == 'json':
-                json = eval(data[5:])
-                print('\n%s' % data[5:])
-                print('\nSending mail to %s...' % json['to_addr'], end='')
-
-                if self.sendMail(json['data'], json['to_addr']):
-                    self.request.sendall('success'.encode())
-                    print('success')
+            try:
+                cur.execute(sql_select % username)
+                res = cur.fetchall()
+                if len(res):
+                    cur.execute(sql_update % (version, timeStr, username))
+                    db.commit()
                 else:
-                    self.request.sendall('fail'.encode())
-                    print('failed')
-            else:
-                print('\nFormat error: %s' % data)
+                    cur.execute(sql_insert % (username, nickname, version, timeStr))
+                    db.commit()
+            except Exception as e:
+                print('Database update error: %s' % e.message)
+                db.rollback()
+        elif info[0] == 'json':
+            json = eval(data[5:])
+            print('\n%s' % data[5:])
+            print('\nSending mail to %s...' % json['to_addr'], end='')
 
-            # print('Connection from %s closed.' % addr)
-        except:
-            print('\nConnection from %s lost.' % addr)
+            if self.sendMail(json['data'], json['to_addr']):
+                self.request.sendall('success'.encode())
+                print('success')
+            else:
+                self.request.sendall('fail'.encode())
+                print('failed')
+        else:
+            print('\nFormat error: %s' % data)
+
+        # print('Connection from %s closed.' % addr)
 
     def sendMail(self, data, to_addr):
         try:
