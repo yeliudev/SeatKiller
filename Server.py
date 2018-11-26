@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 
 import pymysql
-import socket
 import smtplib
 import threading
 import datetime
 import time
 from email.header import Header
 from email.mime.text import MIMEText
+from socketserver import BaseRequestHandler, ThreadingTCPServer
 
 
 FROM_ADDR = 'seatkiller@outlook.com'
@@ -19,94 +19,91 @@ sql_select = "select 1 from user where username='%s' limit 1;"
 sql_update = "update user set version='%s',lastLoginTime='%s' where username='%s';"
 
 
-def sendMail(data, to_addr, passwd):
-    try:
-        body = '---------------------座位预约凭证----------------------'
-        body += '\nID：%d' % data['id']
-        body += '\n凭证号码：%s' % data['receipt']
-        body += '\n时间：%s %s～%s' % (data['onDate'], data['begin'], data['end'])
-        body += '\n状态：%s' % ('已签到' if data['checkedIn'] else '预约')
-        body += '\n地址：%s' % data['location']
-        body += '\n-----------------------------------------------------'
-        body += '\n\nBrought to you by goolhanrry😉'
+class SocketHandler(BaseRequestHandler):
+    def handle(self):
+        sock, addr = self.client_address
 
-        msg = MIMEText(body, 'plain', 'utf-8')
-        msg['From'] = 'SeatKiller <%s>' % FROM_ADDR
-        msg['To'] = 'user <%s>' % to_addr
-        msg['Subject'] = Header('座位预约成功', 'utf-8').encode()
+        try:
+            # print('\nAccept new connection from %s:%s...' % addr)
+            self.request.sendall('hello'.encode())
 
-        server = smtplib.SMTP(SMTP_SERVER, 587)
-        server.starttls()
-        server.login(FROM_ADDR, passwd)
-        server.sendmail(FROM_ADDR, to_addr, msg.as_string())
-        server.quit()
+            data = self.request.recv(512).decode()
+            info = data.split()
+            time.sleep(1)
 
-        return True
-    except:
-        return False
+            if info[0] == 'login':
+                username = info[1]
+                nickname = info[2]
+                version = info[3]
 
+                timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                print('\n%s: %s %s (%s) logged in' % (timeStr, username, nickname, version))
 
-def tcplink(sock, addr, passwd):
-    try:
-        # print('\nAccept new connection from %s:%s...' % addr)
-        sock.send('hello'.encode())
+                try:
+                    cur.execute(sql_select % username)
+                    res = cur.fetchall()
+                    if len(res):
+                        cur.execute(sql_update % (version, timeStr, username))
+                        db.commit()
+                    else:
+                        cur.execute(sql_insert % (username, nickname, version, timeStr))
+                        db.commit()
+                except Exception as e:
+                    print('Database update error: %s' % e.message)
+                    db.rollback()
+            elif info[0] == 'json':
+                json = eval(data[5:])
+                print('\n%s' % data[5:])
+                print('\nSending mail to %s...' % json['to_addr'], end='')
 
-        data = sock.recv(512).decode()
-        info = data.split()
-        time.sleep(1)
-
-        if info[0] == 'login':
-            username = info[1]
-            nickname = info[2]
-            version = info[3]
-
-            timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-            print('\n%s: %s %s (%s) logged in' % (timeStr, username, nickname, version))
-
-            try:
-                cur.execute(sql_select % username)
-                res = cur.fetchall()
-                if len(res):
-                    cur.execute(sql_update % (version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), username))
-                    db.commit()
+                if sendMail(json['data'], json['to_addr']):
+                    self.request.sendall('success'.encode())
+                    print('success')
                 else:
-                    cur.execute(sql_insert % (username, nickname, version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
-                    db.commit()
-            except Exception as e:
-                print('Database update error: %s' % e.message)
-                db.rollback()
-        elif info[0] == 'json':
-            json = eval(data[5:])
-            print('\n%s' % data[5:])
-            print('\nSending mail to %s...' % json['to_addr'], end='')
-
-            if sendMail(json['data'], json['to_addr'], passwd):
-                sock.send('success'.encode())
-                print('success')
+                    self.request.sendall('fail'.encode())
+                    print('failed')
             else:
-                sock.send('fail'.encode())
-                print('failed')
-        else:
-            print('\nFormat error: %s' % data)
+                print('\nFormat error: %s' % data)
 
-        sock.close()
-        # print('Connection from %s:%s closed.' % addr)
-    except:
-        print('\nConnection from %s:%s lost.' % addr)
+            # print('Connection from %s:%s closed.' % addr)
+        except:
+            print('\nConnection from %s:%s lost.' % addr)
+
+    def sendMail(self, data, to_addr):
+        try:
+            body = '---------------------座位预约凭证----------------------'
+            body += '\nID：%d' % data['id']
+            body += '\n凭证号码：%s' % data['receipt']
+            body += '\n时间：%s %s～%s' % (data['onDate'], data['begin'], data['end'])
+            body += '\n状态：%s' % ('已签到' if data['checkedIn'] else '预约')
+            body += '\n地址：%s' % data['location']
+            body += '\n-----------------------------------------------------'
+            body += '\n\nBrought to you by goolhanrry😉'
+
+            msg = MIMEText(body, 'plain', 'utf-8')
+            msg['From'] = 'SeatKiller <%s>' % FROM_ADDR
+            msg['To'] = 'user <%s>' % to_addr
+            msg['Subject'] = Header('座位预约成功', 'utf-8').encode()
+
+            server = smtplib.SMTP(SMTP_SERVER, 587)
+            server.starttls()
+            server.login(FROM_ADDR, passwd)
+            server.sendmail(FROM_ADDR, to_addr, msg.as_string())
+            server.quit()
+
+            return True
+        except:
+            return False
 
 
-passwd = input('Passwd:')
-dbPasswd = input('Database passwd:')
+if __name__ == '__main__':
+    passwd = input('Passwd:')
+    dbPasswd = input('Database passwd:')
 
-db = pymysql.connect(DB_SERVER, 'root', dbPasswd, 'user')
-cur = db.cursor()
+    db = pymysql.connect(DB_SERVER, 'root', dbPasswd, 'user')
+    cur = db.cursor()
 
-s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind(('0.0.0.0', 5210))
-s.listen(10)
-print('Waiting for connection...')
+    s = ThreadingTCPServer(('0.0.0.0', 5210), SocketHandler)
 
-while True:
-    sock, addr = s.accept()
-    t = threading.Thread(target=tcplink, args=(sock, addr, passwd))
-    t.start()
+    print('Waiting for connection...')
+    s.serve_forever()
