@@ -64,7 +64,7 @@ def tcplink(sock, addr, passwd):
             print('\n%s: %s %s (%s) logged in' % (timeStr, username, nickname, version))
 
             try:
-                cur.execute(sql_select % (username))
+                cur.execute(sql_select % username)
                 res = cur.fetchall()
                 if len(res):
                     cur.execute(sql_update % (version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"), username))
@@ -72,12 +72,12 @@ def tcplink(sock, addr, passwd):
                 else:
                     cur.execute(sql_insert % (username, nickname, version, datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")))
                     db.commit()
-            except:
-                print('Database update error')
+            except Exception as e:
+                print('Database update error: %s' % e.message)
                 db.rollback()
         elif info[0] == 'json':
             json = eval(data[5:])
-            print('\n' + data[5:])
+            print('\n%s' % data[5:])
             print('\nSending mail to %s...' % json['to_addr'], end='')
 
             if sendMail(json['data'], json['to_addr'], passwd):
@@ -87,7 +87,7 @@ def tcplink(sock, addr, passwd):
                 sock.send('fail'.encode())
                 print('failed')
         else:
-            print('\nFormat error: ' + data)
+            print('\nFormat error: %s' % data)
 
         sock.close()
         # print('Connection from %s:%s closed.' % addr)
