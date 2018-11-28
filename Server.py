@@ -27,7 +27,7 @@ class SocketHandler(BaseRequestHandler):
 
             self.request.sendall('hello'.encode())
 
-            data = self.request.recv(1024).decode()
+            data = self.request.recv(512).decode()
             info = data.split()
             time.sleep(1)
 
@@ -64,7 +64,7 @@ class SocketHandler(BaseRequestHandler):
             else:
                 print('\nFormat error: %s' % data)
         except Exception as e:
-            print('%s Connection from %s:%s lost : %s' % ((timeStr,) + self.client_address + (e,)))
+            print('\n%s Connection from %s:%s lost : %s' % ((timeStr,) + self.client_address + (e,)))
 
         # print('\n%s Connection from %s:%s closed.' % ((timeStr,) + self.client_address))
 
