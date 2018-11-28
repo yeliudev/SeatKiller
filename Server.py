@@ -22,7 +22,9 @@ sql_update = "update user set version='%s',lastLoginTime='%s' where username='%s
 class SocketHandler(BaseRequestHandler):
     def handle(self):
         try:
-            # print('\nAccept new connection from %s:%s...' % self.client_address)
+            timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            # print('\n%s Accept new connection from %s:%s...' % ((timeStr,) + self.client_address))
+
             self.request.sendall('hello'.encode())
 
             data = self.request.recv(1024).decode()
@@ -34,8 +36,7 @@ class SocketHandler(BaseRequestHandler):
                 nickname = info[2]
                 version = info[3]
 
-                timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                print('\n%s: %s %s (%s) logged in' % (timeStr, username, nickname, version))
+                print('\n%s %s %s (%s) logged in' % (timeStr, username, nickname, version))
 
                 try:
                     cur.execute(sql_select % username)
@@ -63,9 +64,9 @@ class SocketHandler(BaseRequestHandler):
             else:
                 print('\nFormat error: %s' % data)
         except Exception as e:
-            print('Connection from %s:%s lost : %s' % (self.client_address + (e,)))
+            print('%s Connection from %s:%s lost : %s' % ((timeStr,) + self.client_address + (e,)))
 
-        # print('Connection from %s:%s closed.' % self.client_address)
+        # print('\n%s Connection from %s:%s closed.' % ((timeStr,) + self.client_address))
 
     def sendMail(self, data, to_addr):
         try:
