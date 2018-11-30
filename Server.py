@@ -2,7 +2,6 @@
 
 import pymysql
 import smtplib
-import threading
 import datetime
 import time
 from email.header import Header
@@ -14,9 +13,9 @@ FROM_ADDR = 'seatkiller@outlook.com'
 SMTP_SERVER = 'smtp-mail.outlook.com'
 DB_SERVER = '127.0.0.1'
 
-sql_insert = "insert into user(username,nickname,version,lastLoginTime) values('%s','%s','%s','%s');"
 sql_select = "select 1 from user where username='%s' limit 1;"
 sql_update = "update user set version='%s',lastLoginTime='%s' where username='%s';"
+sql_insert = "insert into user(username,nickname,version,lastLoginTime) values('%s','%s','%s','%s');"
 
 
 class SocketHandler(BaseRequestHandler):
@@ -96,8 +95,8 @@ class SocketHandler(BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    passwd = input('Passwd:')
-    dbPasswd = input('Database passwd:')
+    passwd = input('Passwd: ')
+    dbPasswd = input('Database passwd: ')
 
     db = pymysql.connect(DB_SERVER, 'root', dbPasswd, 'user')
     cur = db.cursor()

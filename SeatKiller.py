@@ -59,8 +59,7 @@ class SeatKiller(object):
             if delta.total_seconds() <= 0:
                 print('\n', end='')
                 break
-            print('\r正在等待系统开放...剩余' +
-                  str(int(delta.total_seconds())) + '秒', end='    ')
+            print('\r正在等待系统开放...剩余' + str(int(delta.total_seconds())) + '秒', end='    ')
             time.sleep(0.05)
 
     # 发起GET请求，用旧token换取新token（旧token通过移动端抓包获得，可以保存后多次使用）并构建Headers，成功则返回token字符串，否则返回False
