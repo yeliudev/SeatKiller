@@ -2,8 +2,8 @@
 
 import pymysql
 import smtplib
-import datetime
-import time
+from time import sleep
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from socketserver import BaseRequestHandler, ThreadingTCPServer
@@ -20,15 +20,16 @@ sql_insert = "insert into user(username,nickname,version,lastLoginTime) values('
 
 class SocketHandler(BaseRequestHandler):
     def handle(self):
+        global db, cur
         try:
-            timeStr = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            timeStr = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             # print('\n%s Accept new connection from %s:%s...' % ((timeStr,) + self.client_address))
 
             self.request.sendall('hello'.encode())
 
             data = self.request.recv(512).decode()
             info = data.split()
-            time.sleep(1)
+            sleep(1)
 
             if info[0] == 'login':
                 username = info[1]
@@ -42,13 +43,13 @@ class SocketHandler(BaseRequestHandler):
                     res = cur.fetchall()
                     if len(res):
                         cur.execute(sql_update % (version, timeStr, username))
-                        db.commit()
                     else:
                         cur.execute(sql_insert % (username, nickname, version, timeStr))
-                        db.commit()
+                    db.commit()
                 except Exception as e:
-                    print('Database update error: %s' % e)
-                    db.rollback()
+                    print('Database update error: %s' % e[1])
+                    db = pymysql.connect(DB_SERVER, 'root', dbPasswd, 'cracker')
+                    cur = db.cursor()
             elif info[0] == 'json':
                 json = eval(data[5:])
                 print('\n%s' % data[5:])
