@@ -5,7 +5,7 @@
 [![Language](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
 [![GitHub repo size in bytes](https://img.shields.io/github/repo-size/goolhanrry/SeatKiller.svg?colorB=ff7e00#)](https://github.com/goolhanrry/SeatKiller)
 
-偶然发现图书馆的服务器没设防，于是写了这个小工具练练手，欢迎添加我的微信：`aweawds` 交流讨论
+本工具仅供学习交流，因使用本工具而造成的一切不良后果由使用者自行承担，与作者无关
 
 该仓库已停止维护，所有功能已经移植到了用 C# 重写的 GUI 版本：[SeatKiller_UI](https://github.com/goolhanrry/SeatKiller_UI)
 
@@ -24,7 +24,7 @@
 
 ## 使用方法
 
-1. 配置 [Python3](https://www.python.org/) 运行环境 (已经配置好环境的可忽略此步骤)
+1. 配置 [Python3](https://www.python.org/) 运行环境
 2. Terminal 或 CMD 执行 `pip3 install requests` 安装 requests 库
 3. 运行 `main.py` ，按提示输入相关参数，即可实现自动抢座
 
