@@ -22,20 +22,20 @@ class SocketHandler(BaseRequestHandler):
     def handle(self):
         global db, cur
         try:
-            timeStr = datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            timeStr = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
             # print('\n%s Accept new connection from %s:%s...' % ((timeStr,) + self.client_address))
 
             self.request.sendall('hello'.encode())
 
             data = self.request.recv(512).decode()
             info = data.split()
-            sleep(1)
 
             if info[0] == 'login':
                 username = info[1]
                 nickname = info[2]
                 version = info[3]
 
+                # self.request.sendall('提示&软件正在维护&shutdown'.encode())
                 print('\n%s %s %s (%s) logged in' % (timeStr, username, nickname, version))
 
                 try:
