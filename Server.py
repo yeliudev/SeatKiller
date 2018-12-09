@@ -30,6 +30,9 @@ class SocketHandler(BaseRequestHandler):
             data = self.request.recv(512).decode()
             info = data.split()
 
+            if info[0] == 'notice':
+                # self.request.sendall('提示&软件正在维护&shutdown'.encode())
+                return
             if info[0] == 'login':
                 username = info[1]
                 nickname = info[2]
