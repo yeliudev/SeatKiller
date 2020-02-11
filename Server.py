@@ -80,7 +80,7 @@ class SocketHandler(BaseRequestHandler):
             body += '\n状态：%s' % ('已签到' if data['checkedIn'] else '预约')
             body += '\n地址：%s' % data['location']
             body += '\n-----------------------------------------------------'
-            body += '\n\nBrought to you by goolhanrry😉'
+            body += '\n\nBrought to you by c1aris😉'
 
             msg = MIMEText(body, 'plain', 'utf-8')
             msg['From'] = 'SeatKiller <%s>' % FROM_ADDR
