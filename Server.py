@@ -2,28 +2,26 @@
 
 import pymysql
 import smtplib
-from time import sleep
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from socketserver import BaseRequestHandler, ThreadingTCPServer
-
 
 FROM_ADDR = 'seatkiller@outlook.com'
 SMTP_SERVER = 'smtp-mail.outlook.com'
 DB_SERVER = '127.0.0.1'
 
 sql_select = "select 1 from user where username='%s' limit 1;"
-sql_update = "update user set version='%s',lastLoginTime='%s' where username='%s';"
-sql_insert = "insert into user(username,nickname,version,lastLoginTime) values('%s','%s','%s','%s');"
+sql_update = "update user set version='%s',lastLoginTime='%s' where username='%s';"  # noqa
+sql_insert = "insert into user(username,nickname,version,lastLoginTime) values('%s','%s','%s','%s');"  # noqa
 
 
 class SocketHandler(BaseRequestHandler):
+
     def handle(self):
         global db, cur
         try:
             timeStr = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            # print('\n%s Accept new connection from %s:%s...' % ((timeStr,) + self.client_address))
 
             self.request.sendall('hello'.encode())
 
@@ -39,7 +37,8 @@ class SocketHandler(BaseRequestHandler):
                 version = info[3]
 
                 # self.request.sendall('提示&软件正在维护&shutdown'.encode())
-                print('\n%s %s %s (%s) logged in' % (timeStr, username, nickname, version))
+                print('\n%s %s %s (%s) logged in' %
+                      (timeStr, username, nickname, version))
 
                 try:
                     cur.execute(sql_select % username)
@@ -47,11 +46,13 @@ class SocketHandler(BaseRequestHandler):
                     if len(res):
                         cur.execute(sql_update % (version, timeStr, username))
                     else:
-                        cur.execute(sql_insert % (username, nickname, version, timeStr))
+                        cur.execute(sql_insert %
+                                    (username, nickname, version, timeStr))
                     db.commit()
                 except Exception as e:
                     print('Database update error: %s' % e[1])
-                    db = pymysql.connect(DB_SERVER, 'root', dbPasswd, 'cracker')
+                    db = pymysql.connect(DB_SERVER, 'root', dbPasswd,
+                                         'cracker')
                     cur = db.cursor()
             elif info[0] == 'json':
                 json = eval(data[5:])
@@ -67,16 +68,16 @@ class SocketHandler(BaseRequestHandler):
             else:
                 print('\nFormat error: %s' % data)
         except Exception as e:
-            print('\n%s Connection from %s:%s lost : %s' % ((timeStr,) + self.client_address + (e,)))
-
-        # print('\n%s Connection from %s:%s closed.' % ((timeStr,) + self.client_address))
+            print('\n%s Connection from %s:%s lost : %s' %
+                  ((timeStr, ) + self.client_address + (e, )))
 
     def sendMail(self, data, to_addr):
         try:
             body = '---------------------座位预约凭证----------------------'
             body += '\nID：%d' % data['id']
             body += '\n凭证号码：%s' % data['receipt']
-            body += '\n时间：%s %s～%s' % (data['onDate'], data['begin'], data['end'])
+            body += '\n时间：%s %s～%s' % (data['onDate'], data['begin'],
+                                       data['end'])
             body += '\n状态：%s' % ('已签到' if data['checkedIn'] else '预约')
             body += '\n地址：%s' % data['location']
             body += '\n-----------------------------------------------------'
@@ -94,7 +95,7 @@ class SocketHandler(BaseRequestHandler):
             server.quit()
 
             return True
-        except:
+        except Exception:
             return False
 
 
