@@ -31,5 +31,5 @@
 ## 软件截图
 
 <p align="center">
-  <img width="650" src="https://github.com/c1aris/SeatKiller/blob/master/Screenshot/SeatKiller_Screenshot.png" alt="screenshot">
+  <img width="650" src="assets/screenshot.png" alt="screenshot">
 </p>
