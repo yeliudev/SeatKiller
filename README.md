@@ -1,13 +1,13 @@
 # SeatKiller
 
-[![Build Status](https://img.shields.io/travis/goolhanrry/SeatKiller.svg?branch=master)](https://www.travis-ci.org/goolhanrry/SeatKiller)
+[![Build Status](https://img.shields.io/travis/c1aris/SeatKiller.svg?branch=master)](https://www.travis-ci.org/c1aris/SeatKiller)
 [![License](https://img.shields.io/badge/license-MPL--2.0-red.svg)](LICENSE)
 [![Language](https://img.shields.io/badge/python-3.6-blue.svg)](https://www.python.org/)
-[![GitHub repo size in bytes](https://img.shields.io/github/repo-size/goolhanrry/SeatKiller.svg?colorB=ff7e00#)](https://github.com/goolhanrry/SeatKiller)
+[![GitHub repo size in bytes](https://img.shields.io/github/repo-size/c1aris/SeatKiller.svg?colorB=ff7e00#)](https://github.com/c1aris/SeatKiller)
 
 本工具仅供学习交流，因使用本工具而造成的一切不良后果由使用者自行承担，与作者无关
 
-该仓库已停止维护，所有功能已经移植到了用 C# 重写的 GUI 版本：[SeatKiller_UI](https://github.com/goolhanrry/SeatKiller_UI)
+该仓库已停止维护，所有功能已经移植到了用 C# 重写的 GUI 版本：[SeatKiller_UI](https://github.com/c1aris/SeatKiller_UI)
 
 ## 已经实现的功能
 
@@ -31,5 +31,5 @@
 ## 软件截图
 
 <p align="center">
-  <img width="650" src="https://github.com/goolhanrry/SeatKiller/blob/master/Screenshot/SeatKiller_Screenshot.png" alt="screenshot">
+  <img width="650" src="https://github.com/c1aris/SeatKiller/blob/master/Screenshot/SeatKiller_Screenshot.png" alt="screenshot">
 </p>
