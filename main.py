@@ -169,8 +169,8 @@ if __name__ == '__main__':
         date = datetime.date.today()
         date = date.strftime('%Y-%m-%d')
         if SK.GetSeats(roomId, date):
-            seatName = input(
-                '请输入座位ID（范围：' + min(SK.allSeats.keys()) + '～' + max(SK.allSeats.keys()) + ' 若由系统自动选择请输入\'0\'）：')
+            seatName = input('请输入座位ID（范围：' + min(SK.allSeats.keys()) + '～' +
+                             max(SK.allSeats.keys()) + ' 若由系统自动选择请输入\'0\'）：')
             seatId = SK.allSeats.get(seatName)
         else:
             print('座位ID输入有误，将由系统自动选择')
@@ -178,11 +178,14 @@ if __name__ == '__main__':
 
     while True:
         try_booking = True
-        if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=44, second=40):
-            print('\n------------------------准备获取token------------------------')
+        if datetime.datetime.now() < datetime.datetime.replace(
+                datetime.datetime.now(), hour=22, minute=44, second=40):
+            print(
+                '\n------------------------准备获取token------------------------')
             SK.Wait(22, 44, 40)
         else:
-            print('\n------------------------开始获取token------------------------')
+            print(
+                '\n------------------------开始获取token------------------------')
         date = datetime.date.today() + datetime.timedelta(days=1)
         date = date.strftime('%Y-%m-%d')
         print('\ndate:' + date)
@@ -193,39 +196,47 @@ if __name__ == '__main__':
             if roomId != '0':
                 SK.GetSeats(roomId, date)
 
-            if datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=22, minute=45, second=0):
+            if datetime.datetime.now() < datetime.datetime.replace(
+                    datetime.datetime.now(), hour=22, minute=45, second=0):
                 SK.Wait(22, 45, 0)
-            elif datetime.datetime.now() > datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45,
-                                                                     second=0):
+            elif datetime.datetime.now() > datetime.datetime.replace(
+                    datetime.datetime.now(), hour=23, minute=45, second=0):
                 print('\n预约系统开放时间已过，准备进入捡漏模式')
                 SK.Wait(0, 59, 59, nextDay=True)
                 response = SK.Loop(buildingId, rooms, startTime, endTime)
                 if response[0] in map(str, range(10)) and exchange:
-                    SK.ExchangeLoop('1', SK.xt_lite, startTime,
-                                    endTime, response)
+                    SK.ExchangeLoop('1', SK.xt_lite, startTime, endTime,
+                                    response)
                 sys.exit()
             print('\n------------------------开始预约次日座位------------------------')
             while try_booking:
                 if seatId != '0':
-                    if SK.BookSeat(seatId, date, startTime, endTime) not in ('Failed', 'Connection lost'):
+                    if SK.BookSeat(seatId, date, startTime,
+                                   endTime) not in ('Failed',
+                                                    'Connection lost'):
                         break
                     else:
                         print('\n指定座位预约失败，尝试检索其他空位...')
                         seatId = '0'
-                elif datetime.datetime.now() < datetime.datetime.replace(datetime.datetime.now(), hour=23, minute=45,
-                                                                         second=0):
+                elif datetime.datetime.now() < datetime.datetime.replace(
+                        datetime.datetime.now(), hour=23, minute=45, second=0):
                     SK.freeSeats = []
                     if roomId == '0':
                         for i in rooms:
-                            if SK.SearchFreeSeat(buildingId, i, date, startTime, endTime) == 'Connection lost':
+                            if SK.SearchFreeSeat(buildingId, i, date,
+                                                 startTime,
+                                                 endTime) == 'Connection lost':
                                 print('\n连接丢失，30秒后尝试继续检索空位')
                                 time.sleep(30)
                     else:
                         print('\n尝试检索同区域其他座位...')
-                        if SK.SearchFreeSeat(buildingId, roomId, date, startTime, endTime) != 'Success':
+                        if SK.SearchFreeSeat(buildingId, roomId, date,
+                                             startTime, endTime) != 'Success':
                             print('\n当前区域暂无空位，尝试全馆检索空位...')
                             for i in rooms:
-                                if SK.SearchFreeSeat(buildingId, i, date, startTime, endTime) == 'Connection lost':
+                                if SK.SearchFreeSeat(
+                                        buildingId, i, date, startTime,
+                                        endTime) == 'Connection lost':
                                     print('\n连接丢失，30秒后尝试继续检索空位')
                                     time.sleep(30)
 
@@ -235,24 +246,33 @@ if __name__ == '__main__':
                         continue
 
                     for freeSeatId in SK.freeSeats:
-                        response = SK.BookSeat(
-                            freeSeatId, date, startTime, endTime)
+                        response = SK.BookSeat(freeSeatId, date, startTime,
+                                               endTime)
                         if response == 'Success':
                             try_booking = False
                             break
                         elif response[0] in map(str, range(10)) and exchange:
-                            SK.ExchangeLoop('1', SK.xt_lite, startTime,
-                                            endTime, response, nextDay=True)
+                            SK.ExchangeLoop(
+                                '1',
+                                SK.xt_lite,
+                                startTime,
+                                endTime,
+                                response,
+                                nextDay=True)
                             try_booking = False
                             break
-                        elif response[0] in map(str, range(10)) and not exchange:
+                        elif response[0] in map(str,
+                                                range(10)) and not exchange:
                             try_booking = False
                             break
                         elif response == 'Failed':
                             time.sleep(random.uniform(1, 3))
                         else:
                             ddl = datetime.datetime.replace(
-                                datetime.datetime.now(), hour=23, minute=45, second=0)
+                                datetime.datetime.now(),
+                                hour=23,
+                                minute=45,
+                                second=0)
                             delta = ddl - datetime.datetime.now()
                             print('\n连接丢失，1分钟后重新尝试抢座，系统开放时间剩余' +
                                   str(delta.seconds) + '秒\n')
@@ -262,8 +282,8 @@ if __name__ == '__main__':
                     SK.Wait(0, 59, 59, nextDay=True)
                     response = SK.Loop(buildingId, rooms, startTime, endTime)
                     if response[0] in map(str, range(10)) and exchange:
-                        SK.ExchangeLoop('1', SK.xt_lite, startTime,
-                                        endTime, response)
+                        SK.ExchangeLoop('1', SK.xt_lite, startTime, endTime,
+                                        response)
             print('\n抢座运行结束，2小时后进入下一轮循环')
             time.sleep(7200)
         else:
