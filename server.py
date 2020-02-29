@@ -67,9 +67,8 @@ class SocketHandler(BaseRequestHandler):
                     print('failed')
             else:
                 print('\nFormat error: %s' % data)
-        except Exception as e:
-            print('\n%s Connection from %s:%s lost : %s' %
-                  ((timeStr, ) + self.client_address + (e, )))
+        except Exception:
+            pass
 
     def sendMail(self, data, to_addr):
         try:
@@ -100,7 +99,7 @@ class SocketHandler(BaseRequestHandler):
 
 
 if __name__ == '__main__':
-    passwd = input('Passwd: ')
+    passwd = input('Email passwd: ')
     dbPasswd = input('Database passwd: ')
 
     db = pymysql.connect(DB_SERVER, 'root', dbPasswd, 'seatkiller')
