@@ -1,11 +1,12 @@
-# -*- coding: utf-8 -*-
+# Copyright (c) Ye Liu. All rights reserved.
 
-import pymysql
 import smtplib
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from socketserver import BaseRequestHandler, ThreadingTCPServer
+
+import pymysql
 
 FROM_ADDR = 'seatkiller@outlook.com'
 SMTP_SERVER = 'smtp-mail.outlook.com'
