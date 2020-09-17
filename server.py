@@ -73,7 +73,7 @@ class SocketHandler(BaseRequestHandler):
 
     def sendMail(self, data, to_addr):
         try:
-            body = '---------------------座位预约凭证----------------------'
+            body = '-----------------------------------------------------'
             body += '\nID：%d' % data['id']
             body += '\n凭证号码：%s' % data['receipt']
             body += '\n时间：%s %s～%s' % (data['onDate'], data['begin'],
@@ -81,11 +81,11 @@ class SocketHandler(BaseRequestHandler):
             body += '\n状态：%s' % ('已签到' if data['checkedIn'] else '预约')
             body += '\n地址：%s' % data['location']
             body += '\n-----------------------------------------------------'
-            body += '\n\nBrought to you by c1aris😉'
+            body += '\n\nPowered by SeatKiller 😼'
 
             msg = MIMEText(body, 'plain', 'utf-8')
             msg['From'] = 'SeatKiller <%s>' % FROM_ADDR
-            msg['To'] = 'user <%s>' % to_addr
+            msg['To'] = 'User <%s>' % to_addr
             msg['Subject'] = Header('座位预约成功', 'utf-8').encode()
 
             server = smtplib.SMTP(SMTP_SERVER, 587)
